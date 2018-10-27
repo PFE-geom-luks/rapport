@@ -1,48 +1,37 @@
 \documentclass[12pt,a4paper]{report}
 
 %% Language and font encodings
-\usepackage[english]{babel}
+\usepackage[francais]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
 
 %% Sets page size and margins
 \usepackage[a4paper,left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
-
+\usepackage{titlesec}
 \usepackage{listings}
+\usepackage{graphicx}
 
 \title{Projet de fin d'étude \\ Chiffrement de disque LUKS sous FreeBSD}
 \author{Romain CHERRÉ, Pierre KOEBELIN}
 
-\renewcommand{\thesection}{\Roman{section}}
+\titleformat{\chapter}[block]
+  {\normalfont\huge\bfseries}{\thechapter.}{1em}{\Huge}
+\titlespacing*{\chapter}{0pt}{-19pt}{0pt}
 
-\renewcommand{\thesubsection}{\thesection. \arabic{subsection}}
+%\renewcommand{\thechapter}{\arabic{chapter}}
 
-\renewcommand{\thesubsubsection}{\thesubsection. \alph{subsubsection}\hspace{5mm} }
+%\renewcommand{\thesubsection}{\thesection. \arabic{subsection}}
+
+%\renewcommand{\thesubsubsection}{\thesubsection. \arabic{subsubsection}}
 
 
-
-\setcounter{tocdepth}{3}
 \begin{document}
 \maketitle
 
 \tableofcontents
 \newpage
 
-
-\section{Etat de l'art}
-\paragraph*{} A rédiger
-\subsection{Différents niveaux de chiffrements}
-\paragraph*{} A rédiger
-\subsection{Chiffrement de disque sur Linux et FreeBSD}
-\paragraph*{} A rédiger
-\subsubsection{Organisation dans le système d'exploitation}
-\paragraph*{} A rédiger
-\subsubsection{Format sur disque}
-\paragraph*{} A rédiger
-\subsubsection{Algorithmes}
-\paragraph*{} A rédiger
-\subsubsection{Fonctionnalités}
-\paragraph*{} A rédiger
+\input{etat_art/etat_art.tex}
 
 \end{document}
