@@ -89,7 +89,7 @@ L'en-tête permet de stocker 2 clés, et s'étend sur un seul secteur.
 \begin{figure}[h]
 \centering
 \includegraphics[width=.5\linewidth]{etat_art/format_disque_geli.png}
-\caption{\label{fig:LUKSFormat}Format sur disque GELI}
+\caption{\label{fig:GELIFormat}Format sur disque GELI}
 \end{figure}
 
 \paragraph{}
@@ -101,6 +101,47 @@ l'en-tête sous GELI fait 255 octets, contre 592 octets pour LUKS.
 
 
 \subsection{Algorithmes}
-\paragraph*{} A rédiger
+\subsubsection{Algorithmes de chiffrement}
+\paragraph{}
+Les algorithmes de chiffrement disponibles pour GELI sont :
+\begin{itemize}
+	\item Null
+	\item Null-CBC
+	\item AES-CBC
+	\item AES-XTS
+	\item Blowfish
+	\item Blowfish-CBC
+	\item Camellia
+	\item Camellia-CBC
+	\item 3DES
+	\item 3DES-CBC
+\end{itemize}
+
+\paragraph{}
+d'après \cite{geli.h}
+
+\paragraph{}
+Dans le cas de {\em LUKS}, la spécification \cite{onDiskFormatLuks}
+ne précise pas la liste des algorithmes disponibles, la liste des algorithmes 
+possibles est laissée ouverte pour permettre l'utilisation de tout ceux que le 
+noyau Linux peut mettre à disposition via son API.
+
+\subsubsection{Algorithmes d'authentification (HMAC)}
+\paragraph{}
+Les algorithmes d'authentification disponibles sous GELI sont:
+\begin{itemize}
+	\item MD5
+	\item SHA1
+	\item Ripemd160
+	\item SHA256
+	\item SHA384
+	\item SHA512
+\end{itemize}
+
+\paragraph{}
+Tandis qu'encore une fois pour LUKS, la liste des algorithmes autorisée, n'est 
+pas précisée, c'est donc celle que le noyau Linux peut mettre à disposition 
+qui est disponible.
+
 \subsection{Fonctionnalités}
 \paragraph*{} A rédiger
