@@ -144,4 +144,43 @@ pas précisée, c'est donc celle que le noyau Linux peut mettre à disposition
 qui est disponible.
 
 \subsection{Fonctionnalités}
-\paragraph*{} A rédiger
+\paragraph{}
+Les deux systèmes de chiffrement : {\em dm-crypt \em et \em geli} profitent 
+de l'accélération matérielle pour les opérations de chiffrement grâce au 
+noyau (AES-NI notamment). LUKS supporte l'hibernation sur disque 
+contrairement à GELI, qui ne le supporte pas car FreeBSD ne supporte pas 
+l'hibernation sur disque. Les deux systèmes permettent le renforcement de 
+phrases de passe, via la fonction {\em PBKDF2} décrite par le standard 
+{\em PKCS\#5v2}. Les deux formats de métadonnées permettent l'utilisation de 
+plusieurs clés.
+
+\subsubsection{Intégration avec la séquence de démarrage}
+\paragraph{}
+L'intégration avec le démarrage permet notamment d'avoir la racine du système 
+de fichier sur une partition chiffrée, et même éventuellement le {\em /boot}
+dans lequel sont usuellement stockés les fichiers permettant de démarrer le 
+système d'exploitation.
+
+\paragraph{}
+Dans le cas de Linux, le format LUKS a été intégré dans l'initramfs via un
+hook qui charge le module dm-crypt puis utilise le binaire cryptsetup pour 
+déchiffrer le disque. Le format LUKS a également été intégré à GRUB sous la 
+forme du module {\em luks.mod}. Il permet au premier stage de GRUB de 
+déchiffrer la partition sur laquelle se trouve la configuration de GRUB.
+Ainsi sous Linux, il est possible de chiffrer toute la racine de son système,
+{\em /boot} compris. Il est ensuite question de pouvoir taper un seule fois la 
+phrase de passe, pouvoir faire de l'authentification unique (SSO), cela est 
+également possible, il suffit de mettre un keyfile dans l'initramfs, qui 
+contient la clé du disque. Ainsi GRUB déchiffre le disque, puis charge 
+l'initramfs qui peut déchiffrer la partition sans avoir besoin de demander une 
+phrase de passe.
+
+\paragraph{}
+Dans le cas de GELI, il est également possible de chiffrer la racine du 
+système, le bootloader de FreeBSD étant capable de lire les métadonnées GELI, 
+ainsi que de déchiffrer des données. Il est également possible de chiffrer le 
+{\em /boot} car le 2ème stage du bootloader ({\em boot2}) contient le code 
+nécessaire pour déchiffrer un disque au format GELI, à condition que la table 
+de partition soit au format GPT. La phrase de passe est passée via une zone 
+mémoire au dernier stage qui pourra l'utiliser pour démarrer.
+
