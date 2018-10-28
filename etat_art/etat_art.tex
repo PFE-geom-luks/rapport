@@ -6,14 +6,16 @@
 \paragraph*{} A rédiger
 \subsection{Organisation dans le système d'exploitation}
 \paragraph{}
-Dans le cas de Linux, le chiffrement de disque est géré par le module noyau
-{\em dm-crypt}, qui est un module qui dépend du module plus général
-{\em device-mapper} qui gère les transformations de disque sous linux (RAID, 
-LVM, Cache, ...). Le module dm-crypt gère la table appelée {\em crypt table}
+Dans le cas de {\em Linux}, le chiffrement de disque est géré par le module 
+noyau {\em dm-crypt}, qui est un module qui dépend du module plus général
+{\em device-mapper} qui gère les transformations de disque sous {\em Linux} 
+(RAID, LVM, Cache, ...).
+Le module {\em dm-crypt} gère la table appelée {\em crypt table}
 qui permet d'associer un device à un chiffrement notamment. La table permet
-la lecture des données sur le disque. A celà s'ajoute le programme cryptsetup
-qui permet de lire des métadonnées stockées sur le disque pour remplir la {\em
-crypt table}. Le programme s'occupe notamment du déchiffrement de la clé, de 
+la lecture des données sur le disque. A celà s'ajoute le programme 
+{\em cryptsetup} qui permet de lire des métadonnées stockées sur le disque 
+pour remplir la {\em crypt table}.
+Le programme s'occupe notamment du déchiffrement de la clé, de 
 la lecture et de l'écriture des métadonnées sur le disque. L'organisation est 
 donc la suivante :
 
@@ -28,24 +30,26 @@ donc la suivante :
 L'organisation reflétée par les programmes l'est également au niveau du code,
 le module {\em dm-crypt} est agnostique de l'existance de métadonnées ainsi 
 que de leur format. On a donc le module {\em device-mapper \em et \em dm-crypt}
-qui font partie du code du noyau Linux, tandis que {\em Crypsetup} est un 
-programme qui est fournit par linux en tant qu'utilitaire, qui est géré par 
-une équipe indépendante de celle du noyau Linux. De plus {\em dm-crypt} est 
-agnostique des algorithmes de chiffrement disponibles, le module s'appuie sur 
-l'API de cryptographie du noyau.
+qui font partie du code du noyau {\em Linux}, tandis que {\em Crypsetup} est un 
+programme qui est fournit par {\em Linux} en tant qu'utilitaire, qui est géré
+par une équipe indépendante de celle du noyau {\em Linux}. De plus 
+{\em dm-crypt} est agnostique des algorithmes de chiffrement disponibles,
+le module s'appuie sur l'API de cryptographie du noyau.
 
 \paragraph{}
-Dans le cas de FreeBSD, le module noyau qui est en charge des
-transformations sur les disques est {\em GEOM}. Comme sous linux, il existe des
-modules qui vont interagir avec GEOM pour fournir des fonction de RAID, de 
-cache, et également de chiffrement. Ces modules sont appelés {\em Classes GEOM}, 
+Dans le cas de {\em FreeBSD}, le module noyau qui est en charge des
+transformations sur les disques est {\em GEOM}. Comme sous {\em Linux}, 
+il existe des modules qui vont interagir avec GEOM pour fournir des fonction 
+de RAID, de cache, et également de chiffrement. 
+Ces modules sont appelés {\em Classes GEOM}, 
 celle qui fournit le chiffrement est nommée {\em ELI}, le module noyau associé 
 est ainsi appelé {\em GELI}. Le module contrairement à {\em dm-crypt}, 
 comprend toute la logique des métadonnées, ainsi que des algorithmes de 
-chiffrement disponibles. L'outil en espace utilisateur tire son code directement
- du code du module {\em geli}. {\em GELI} profite de la connaissance du format 
-des métadonnées pour directement détecter les partitions chiffrées, et donc 
-proposer leur déchiffrement à l'utilisateur, là où Linux ne peut pas détecter de
+chiffrement disponibles. L'outil en espace utilisateur tire son code
+directement du code du module {\em geli}. {\em GELI} profite de la 
+connaissance du format des métadonnées pour directement détecter les 
+partitions chiffrées, et donc proposer leur déchiffrement à l'utilisateur, 
+là où {\em Linux} ne peut pas détecter de
 partition ou disque chiffré, et c'est à l'utilisateur de préciser qu'il veut 
 déchiffrer tel disque avec l'outil {\em crypsetup} qui va donc reconnaître le 
 format.
@@ -57,13 +61,14 @@ Le format sur disque désigne l'organisation des données et métadonnées sur l
 disque. L'idée générale étant de stocker sur une partie du disque les 
 informations permettant de déchiffrer une autre partie du disque.
 \paragraph{}
-Comme le noyau Linux ne contient pas de format de métadonnées, 
+Comme le noyau {\em Linux} ne contient pas de format de métadonnées, 
 c'est {\em Crypsetup} qui a choisi de créer un format appelé {\em Linux 
-Unified Key Setup (LUKS)}, comme format standard pour le chiffrement de disque 
-sous Linux. En effet, {\em Crypsetup} implémente d'autres format de 
-métadonnées comme {\em TrueCrypt} développé par la {\em TrueCrypt Fondation}. 
-Le format LUKS consiste en des métadonnées au début de la partition, précédant 
-les données chiffrées.
+Unified Key Setup ({\em LUKS})}, comme format standard pour le chiffrement de 
+disque sous {\em Linux}. En effet, {\em Crypsetup} implémente d'autres format 
+de métadonnées comme {\em TrueCrypt} développé par la 
+{\em TrueCrypt Fondation}. 
+Le format {\em LUKS} consiste en des métadonnées au début de la partition, 
+précédant les données chiffrées.
 
 \paragraph{}
 \begin{figure}[h]
@@ -73,15 +78,16 @@ les données chiffrées.
 \end{figure}
 
 \paragraph{}
-Les métadonnées de LUKS contenant les algorithmes de chiffrement, 
-d'authentification, la version de LUKS, sont suivis de huit emplacements 
+Les métadonnées de {\em LUKS} contenant les algorithmes de chiffrement, 
+d'authentification, la version de {\em LUKS}, sont suivis de huit emplacements 
 permettant de stocker des clés chiffrées, qui permettent de déchiffrer le 
 disque. Ainsi on peut stocker la même clé huit fois, protégées par des mots de 
 passe différents, permettant ainsi à plusieurs utilisateurs de déchiffrer le 
 même disque sans pour autant partager le même mot de passe.
 
 \paragraph{}
-Les métadonnées de GELI sont stockées contrairement à LUKS, à la fin du disque.
+Les métadonnées de {\em GELI} sont stockées contrairement à {\em LUKS}, 
+à la fin du disque.
 L'en-tête permet de stocker 2 clés, et s'étend sur un seul secteur.
 
 
@@ -96,14 +102,14 @@ L'en-tête permet de stocker 2 clés, et s'étend sur un seul secteur.
 Dans les deux en-têtes on retrouve des champs similaires, un {\em Magic} qui 
 permet de connaître le type d'en-tête, la version, l'algorithme de chiffrement 
 et d'authentification, etc. On peut noter tout de même que la taille de 
-l'en-tête sous GELI fait 255 octets, contre 592 octets pour LUKS.
+l'en-tête sous {\em GELI} fait 255 octets, contre 592 octets pour {\em LUKS}.
 
 
 
 \subsection{Algorithmes}
 \subsubsection{Algorithmes de chiffrement}
 \paragraph{}
-Les algorithmes de chiffrement disponibles pour GELI \cite{geli.h} sont :
+Les algorithmes de chiffrement disponibles pour {\em GELI} \cite{geli.h} sont :
 \begin{itemize}
 	\item Null
 	\item Null-CBC
@@ -121,27 +127,28 @@ Les algorithmes de chiffrement disponibles pour GELI \cite{geli.h} sont :
 Dans le cas de {\em LUKS}, la spécification \cite{onDiskFormatLuks}
 ne précise pas la liste des algorithmes disponibles, la liste des algorithmes 
 possibles est laissée ouverte pour permettre l'utilisation de tout ceux que le 
-noyau Linux peut mettre à disposition via son API.
+noyau {\em Linux} peut mettre à disposition via son API.
 
 \subsubsection{Utilisation de la clé primaire}
 \paragraph{}
-Dans le cas de LUKS, la spécification \cite{onDiskFormatLuks} précise que la 
-clé stockée dans l'en-tête LUKS est utilisée directement comme clé de 
-chiffrement. Dans le cas de GELI, la clé est dérivée selon un algorithme 
-déterministe en des clés utilisées pour chiffrer les données, qui dépendent de 
-la version de GELI et de l'utilisation d'authentification des données 
-\cite{manGeli}. La version 5 de GELI utilisait une seule clé, qui était la clé
+Dans le cas de {\em LUKS}, la spécification \cite{onDiskFormatLuks} précise 
+que la clé stockée dans l'en-tête {\em LUKS} est utilisée directement comme 
+clé de chiffrement. Dans le cas de {\em GELI}, la clé est dérivée selon un 
+algorithme déterministe en des clés utilisées pour chiffrer les données, 
+qui dépendent de la version de {\em GELI} et de l'utilisation 
+d'authentification des données \cite{manGeli}. 
+La version 5 de {\em GELI} utilisait une seule clé, qui était la clé
 primaire fournie par les métadonnées, à partir de la version 6, la clé primaire
 est dérivée en clés de chiffrement, qui diffèrent tout les 2\textasciicircum20 
 secteurs, soit 1048576 secteurs du disques. Les tailles des secteurs des 
 disques étant généralement de 512 octets ou 4096 octets, 
 donc tout les 500Mo ou 4Go environ.
 La taille du secteur correspond au champs taille du secteur des métadonnées
-GELI.
+{\em GELI}.
 
 \subsubsection{Algorithmes d'authentification (HMAC)}
 \paragraph{}
-Les algorithmes d'authentification disponibles sous GELI sont:
+Les algorithmes d'authentification disponibles sous {\em GELI} sont:
 \begin{itemize}
 	\item MD5
 	\item SHA1
@@ -152,20 +159,20 @@ Les algorithmes d'authentification disponibles sous GELI sont:
 \end{itemize}
 
 \paragraph{}
-Tandis qu'encore une fois pour LUKS, la liste des algorithmes autorisée, n'est 
-pas précisée, c'est donc celle que le noyau Linux peut mettre à disposition 
-qui est disponible.
+Tandis qu'encore une fois pour {\em LUKS}, la liste des algorithmes autorisée,
+n'est pas précisée, c'est donc celle que le noyau {\em Linux} peut mettre à 
+disposition qui est disponible.
 
 \subsection{Fonctionnalités}
 \paragraph{}
 Les deux systèmes de chiffrement : {\em dm-crypt \em et \em geli} profitent 
 de l'accélération matérielle pour les opérations de chiffrement grâce au 
-noyau (AES-NI notamment). LUKS supporte l'hibernation sur disque 
-contrairement à GELI, qui ne le supporte pas car FreeBSD ne supporte pas 
-l'hibernation sur disque. Les deux systèmes permettent le renforcement de 
-phrases de passe, via la fonction {\em PBKDF2} décrite par le standard 
-{\em PKCS\#5v2}. Les deux formats de métadonnées permettent l'utilisation de 
-plusieurs clés.
+noyau (AES-NI notamment). {\em LUKS} supporte l'hibernation sur disque 
+contrairement à {\em GELI}, qui ne le supporte pas car {\em FreeBSD} ne 
+supporte pas l'hibernation sur disque. Les deux systèmes permettent le 
+renforcement de phrases de passe, via la fonction {\em PBKDF2} décrite 
+par le standard {\em PKCS\#5v2}. Les deux formats de métadonnées 
+permettent l'utilisation de plusieurs clés.
 
 \subsubsection{Intégration avec la séquence de démarrage}
 \paragraph{}
@@ -175,25 +182,28 @@ dans lequel sont usuellement stockés les fichiers permettant de démarrer le
 système d'exploitation.
 
 \paragraph{}
-Dans le cas de Linux, le format LUKS a été intégré dans l'initramfs via un
-hook qui charge le module dm-crypt puis utilise le binaire cryptsetup pour 
-déchiffrer le disque. Le format LUKS a également été intégré à GRUB sous la 
-forme du module {\em luks.mod}. Il permet au premier stage de GRUB de 
-déchiffrer la partition sur laquelle se trouve la configuration de GRUB.
-Ainsi sous Linux, il est possible de chiffrer toute la racine de son système,
-{\em /boot} compris. Il est ensuite question de pouvoir taper un seule fois la 
-phrase de passe, pouvoir faire de l'authentification unique (SSO), cela est 
+Dans le cas de {\em Linux}, le format {\em LUKS} a été intégré dans
+l'initramfs via un hook qui charge le module {\em dm-crypt} puis utilise 
+le binaire {\em cryptsetup} pour déchiffrer le disque. 
+Le format {\em LUKS} a également été intégré à {\em GRUB} sous la 
+forme du module {\em luks.mod}. Il permet au premier stage de {\em GRUB} de 
+déchiffrer la partition sur laquelle se trouve la configuration de {\em GRUB}.
+Ainsi sous {\em Linux}, il est possible de chiffrer toute la racine de son 
+système, {\em /boot} compris. Il est ensuite question de pouvoir taper une 
+seule fois la phrase de passe, 
+pouvoir faire de l'authentification unique (SSO), cela est 
 également possible, il suffit de mettre un fichier contenant la clé de 
-chiffrement en clair dans l'initramfs. Ainsi GRUB déchiffre le disque, 
+chiffrement en clair dans l'initramfs. Ainsi {\em GRUB} déchiffre le disque, 
 puis charge l'initramfs qui peut déchiffrer la partition sans avoir besoin 
 de demander une phrase de passe.
 
 \paragraph{}
-Dans le cas de GELI, il est également possible de chiffrer la racine du 
-système, le bootloader de FreeBSD étant capable de lire les métadonnées GELI, 
-ainsi que de déchiffrer des données. Il est également possible de chiffrer le 
+Dans le cas de {\em GELI}, il est également possible de chiffrer la racine du 
+système, le bootloader de {\em FreeBSD} étant capable de lire les métadonnées 
+{\em GELI}, ainsi que de déchiffrer des données. 
+Il est également possible de chiffrer le 
 {\em /boot} car le 2ème stage du bootloader ({\em boot2}) contient le code 
-nécessaire pour déchiffrer un disque au format GELI, à condition que la table 
-de partition soit au format GPT. La phrase de passe est passée via une zone 
-mémoire au dernier stage qui pourra l'utiliser pour démarrer.
+nécessaire pour déchiffrer un disque au format {\em GELI}, à condition que 
+la table de partition soit au format GPT. La phrase de passe est passée via 
+une zone mémoire au dernier stage qui pourra l'utiliser pour démarrer.
 
