@@ -103,7 +103,7 @@ l'en-tête sous GELI fait 255 octets, contre 592 octets pour LUKS.
 \subsection{Algorithmes}
 \subsubsection{Algorithmes de chiffrement}
 \paragraph{}
-Les algorithmes de chiffrement disponibles pour GELI sont :
+Les algorithmes de chiffrement disponibles pour GELI \cite{geli.h} sont :
 \begin{itemize}
 	\item Null
 	\item Null-CBC
@@ -116,9 +116,6 @@ Les algorithmes de chiffrement disponibles pour GELI sont :
 	\item 3DES
 	\item 3DES-CBC
 \end{itemize}
-
-\paragraph{}
-d'après \cite{geli.h}
 
 \paragraph{}
 Dans le cas de {\em LUKS}, la spécification \cite{onDiskFormatLuks}
@@ -170,10 +167,10 @@ déchiffrer la partition sur laquelle se trouve la configuration de GRUB.
 Ainsi sous Linux, il est possible de chiffrer toute la racine de son système,
 {\em /boot} compris. Il est ensuite question de pouvoir taper un seule fois la 
 phrase de passe, pouvoir faire de l'authentification unique (SSO), cela est 
-également possible, il suffit de mettre un keyfile dans l'initramfs, qui 
-contient la clé du disque. Ainsi GRUB déchiffre le disque, puis charge 
-l'initramfs qui peut déchiffrer la partition sans avoir besoin de demander une 
-phrase de passe.
+également possible, il suffit de mettre un fichier contenant la clé de 
+chiffrement en clair dans l'initramfs. Ainsi GRUB déchiffre le disque, 
+puis charge l'initramfs qui peut déchiffrer la partition sans avoir besoin 
+de demander une phrase de passe.
 
 \paragraph{}
 Dans le cas de GELI, il est également possible de chiffrer la racine du 
