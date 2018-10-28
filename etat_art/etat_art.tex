@@ -128,11 +128,11 @@ noyau Linux peut mettre à disposition via son API.
 Dans le cas de LUKS, la spécification \cite{onDiskFormatLuks} précise que la 
 clé stockée dans l'en-tête LUKS est utilisée directement comme clé de 
 chiffrement. Dans le cas de GELI, la clé est dérivée selon un algorithme 
-déterministe en des clé utilisée pour chiffrer les données, qui dépendent de 
+déterministe en des clés utilisées pour chiffrer les données, qui dépendent de 
 la version de GELI et de l'utilisation d'authentification des données 
-\cite{manGeli}. La version 5 de GELI utilisait une seule clée, qui était la clé
-primaire fournit par les métadonnées, à partir de la version 6, la clé primaire
-est dérivée en clé de chiffrement, qui diffèrent tout les 2\textasciicircum20 
+\cite{manGeli}. La version 5 de GELI utilisait une seule clé, qui était la clé
+primaire fournie par les métadonnées, à partir de la version 6, la clé primaire
+est dérivée en clés de chiffrement, qui diffèrent tout les 2\textasciicircum20 
 secteurs, soit 1048576 secteurs du disques. Les tailles des secteurs des 
 disques étant généralement de 512 octets ou 4096 octets, 
 donc tout les 500Mo ou 4Go environ.
