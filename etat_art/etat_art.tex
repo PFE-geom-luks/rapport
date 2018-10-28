@@ -125,9 +125,24 @@ Les algorithmes de chiffrement disponibles pour {\em GELI} \cite{geli.h} sont :
 
 \paragraph{}
 Dans le cas de {\em LUKS}, la spécification \cite{onDiskFormatLuks}
-ne précise pas la liste des algorithmes disponibles, la liste des algorithmes 
-possibles est laissée ouverte pour permettre l'utilisation de tout ceux que le 
-noyau {\em Linux} peut mettre à disposition via son API.
+la liste des algorithmes disponibles, les noms des algorithmes ne sont pas 
+interprétés par des opérations {\em LUKS}, mais pour des besoins de 
+compatibilité avec d'autres implémentations, la liste des algorithmes 
+disponibles est la suivante :
+\begin{itemize}
+	\item AES
+	\item Twofish
+	\item Serpent
+	\item Cast5
+	\item Cast6
+\end{itemize}
+Les algorithmes peuvent être associés aux modes suivants :
+\begin{itemize}
+	\item ECB
+	\item CBC-plain
+	\item CBC-essiv:hash
+	\item XTS-plain64
+\end{itemize}
 
 \subsubsection{Utilisation de la clé primaire}
 \paragraph{}
@@ -159,10 +174,28 @@ Les algorithmes d'authentification disponibles sous {\em GELI} sont:
 \end{itemize}
 
 \paragraph{}
-Tandis qu'encore une fois pour {\em LUKS}, la liste des algorithmes autorisée,
-n'est pas précisée, c'est donc celle que le noyau {\em Linux} peut mettre à 
-disposition qui est disponible.
+Dans le cas de {\em LUKS}, le chiffrement avec de l'authentification des 
+données n'est pas supporté, cependant le service d'intégrité peut être rendu 
+par le module {\em dm-verity} ou {\em dm-integrity}, le format des métadonnées 
+est spécifié indépendamment de {\em LUKS}. Dans le cas où l'on souhaite faire 
+du chiffrement et de l'authentification il est alors conseillé d'utiliser le 
+module {\em dm-integrity}.
 
+\subsubsection{Fonction pseudo aléatoire pour PBKDF2}
+\paragraph{}
+La spécification de PBKDF2 \cite{PKCS5v2} précise l'utilisation d'une fonction
+pseudo aléatoire, dans le cas de {\em LUKS}, la spécification 
+\cite{onDiskFormatLuks} liste les algorithmes autorisés
+pour des raisons de compatibilité :
+\begin{itemize}
+	\item SHA1 (algorithme par défaut)
+	\item SHA256
+	\item SHA512
+	\item Ripemd160
+\end{itemize}
+\paragraph{}
+Dans le cas de {\em GELI}, c'est l'algorithme {\em SHA512} qui est utilisé
+selon \cite{geliPkcs5v2.c}.
 \subsection{Fonctionnalités}
 \paragraph{}
 Les deux systèmes de chiffrement : {\em dm-crypt \em et \em geli} profitent 
