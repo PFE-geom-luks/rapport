@@ -4,7 +4,7 @@
 Ce projet consiste en la réalisation d'un module noyau pour FreeBSD rendant
 possible l'utilisation d'un volume chiffré avec
 \textit{LUKS}\cite{onDiskFormatLuks}, un standard de chiffrement associé au
-noyau Linux.
+noyau \textit{Linux}.
 \paragraph{}
 L'objectif est donc de relever et comparer les moyens de chiffrement de disques
 actuels, et d'analyser plus particulièrement les modules noyau Linux et FreeBSD
@@ -12,6 +12,19 @@ gérant le chiffrement de volume afin de porter le standard
 \textit{LUKS}\cite{onDiskFormatLuks} vers FreeBSD.
 
 \section{Différents niveaux de chiffrements}
+
+\subsection{Chiffrement matériel}
+\paragraph{}
+Le chiffrement matériel (\textit{Hardware-based full disk encryption},
+\textit{FDE}) concerne certains disques (appelés \textit{Self-encrypting drive})
+ou autres espaces de stockage. Leur fonctionnement est basé sur le contrôleur
+du disque qui gère les clés de chiffrement, et œuvrant indépendamment du 
+processeur. L'authentification se fait alors avec un via un logiciel 
+s'exécutant avant le démarrage du système ou mot de passe dans le BIOS.
+\paragraph{}
+Le groupe \textbf{Trusted Computing Group} réunissant plusieurs fabricants a mis
+en place une spécification, \textit{Opal Storage Specification}, pour ce type de
+disques auto-chiffrés.
 
 \subsection{Chiffrement à la volée}
 \paragraph{}
@@ -25,8 +38,8 @@ Dans des systèmes comme Linux ou FreeBSD, le chiffrement et déchiffrement du
 disque est réalisé directement par le noyau. Au moment de la lecture et de
 l'écriture du disque, les données passent par une couche supplémentaire
 (\textit{dm-crypt} pour Linux et \textit{GELI}\cite{manGeli} pour FreeBSD) dont
-le rôle est de faire le lien entre les données chiffrées du disque et celle en
-claire visibles et utilisables par l'utilisateur.
+le rôle est de faire le lien entre les données chiffrées du disque et celles en
+clair : visibles et utilisables par l'utilisateur.
 \paragraph{}
 Le fait que la lecture d'un disque soit faite par le noyau permet à un système
 utilisant cette méthode de chiffrer tout le système, à l'exception d'une petite
@@ -35,15 +48,17 @@ ensuite être directement déchiffré par le noyau.
 
 \subsection{Chiffrement au niveau du système de fichiers}
 \paragraph{}
-Le chiffrement de système de fichier consiste en la création d'un système de
-fichier qui sera ensuite enregistré chiffré sur le disque. C'est nottament la
-technoligie utilisée par l'\textit{Encrypting File System} (abrégé EFS), une
-technologie Microsoft disponible dès la troisième version des systèmes de
-fichiers NTFS. D'autres solutions existent également, comme EncFS. Des logiciels
-comme TrueCrypt/VeraCrypt permettent également de réaliser de genre
+Le chiffrement de système de fichiers consiste à confier le rôle de chiffrement
+et déchiffrement au sytème de fichiers, qui peut alors chiffrer les fichiers, 
+leurs métadonnées, l'arborescence, selon les implémentations. 
+C'est notamment la technologie utilisée par l'\textit{Encrypting File System}
+(abrégé EFS), une technologie Microsoft disponible dès la troisième version 
+des systèmes de fichiers NTFS. 
+D'autres solutions existent également, comme EncFS. Des logiciels
+comme TrueCrypt/VeraCrypt permettent également de réaliser ce genre
 d'opérations, en chiffrant des fichiers dans un conteneur.
 \paragraph{}
-Le type de chiffrement a l'avantage de chiffrer toute une arborescence de
+Ce type de chiffrement a l'avantage de chiffrer toute une arborescence de
 fichiers indépendamment des autres fichiers présents sur le disque. Cela permet
 d'avoir différentes clés de chiffrement par système de fichiers chiffrés,
 contrairement au chiffrement de disque qui en impose une seule par partition.
@@ -57,38 +72,26 @@ chiffrement.
 \paragraph{}
 Ce type de chiffrement permet de chiffrer un seul fichier. Il peut s'agir
 d'archives possédant cette propriété de pouvoir être chiffrées et déchiffrées
-par les logiciels spécialisés. Dans ce cas, seul le contenu de l'archive est
+par des logiciels spécialisés. Dans ce cas, seul le contenu de l'archive est
 chiffré et les métadonnées restent en clair. C'est le type de chiffrement
 utilisé par des archives comme \textit{7z}. Le chiffrement peut également se
-faire directement sur un fichier, en utilisant des solutions comme
-\textit{gpg}, en créant un nouveau fichier \textit{.gpg} étant le chiffré de
-celui d'origine.
+faire directement sur un fichier, en utilisant des algorithmes standards de 
+chiffrement comme AES ou RSA, via des solutions logicielles comme
+\textit{gpg}, le fichier ainsi créé par chiffrement est agnostique du format 
+du fichier en clair.
 
-\subsection{Chiffrement matériel}
-\paragraph{}
-Le chiffrement matériel (\textit{Hardware-based full disk encryption},
-\textit{FDE}) concerne certains disques (appelés \textit{Self-encrypting drive})
-ou autres espaces de stockage. Leur fonctionnement est basé sur le contrôleur
-qui gère les clés de chiffrement servant au chiffrement du disque, et
-œuvrant indépendamment du processeur. L'authentification se fait alors avec un
-via un logiciel s'exécutant avant le démarrage du système ou mot de passe dans
-le BIOS.
-\paragraph{}
-Le groupe \textbf{Trusted Computing Group} réunissant plusieurs fabricant a mis
-en place une spécification, \textit{Opal Storage Specification}, pour ce type de
-disques auto-chiffrés.
 
 \section{Chiffrement de disque sur Linux et FreeBSD}
 
 \paragraph{}
 Le chiffrement de disque sous Linux et FreeBSD est un chiffrement à la volée. Il
 est géré par des modules noyaux qui interviennent au moment de la lecture et
-l'écriture du disque. Les opérations qu'ils réalisent sont totalement
+l'écriture sur disque. Les opérations qu'ils réalisent sont totalement
 transparentes du point de vue de l'utilisateur, qui ne manipule que des données
 en clair.
 \paragraph{}
 Chacun des deux systèmes a accès à différents algorithmes implémentés dans le
-noyau et permettant le hachage et la chiffrement de données. Le chiffrement sur
+noyau et permettant le chiffrement de données. Le chiffrement sur
 les deux systèmes peut se faire sur des disques entiers, des partitions
 physiques ou logiques (comme LVM), des volumes RAID, la RAM, ...
 \paragraph{Linux}
@@ -108,7 +111,7 @@ disques et autres volumes.\\
 \\
 Contrairement à \textit{dm-crypt} qui peut accepter des paramètres correspondant
 à différents standards (non limités à LUKS), le seul standard disponible pour
-le chiffrement de volume avec \textit{GELI} est celui ce \textit{GELI} lui-même.
+le chiffrement de volume avec \textit{GELI} est celui de \textit{GELI} lui-même.
 
 \subsection{Organisation dans le système d'exploitation}
 \paragraph{}
