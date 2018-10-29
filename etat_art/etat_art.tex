@@ -1,9 +1,79 @@
 \chapter{Etat de l'art}
 \paragraph*{} A rédiger
 \section{Différents niveaux de chiffrements}
-\paragraph*{} A rédiger
+
+\subsection{Chiffrement de disque (chiffrement à la volée)}
+\paragraph{}
+Le chiffrement de disque est généralement géré par le noyau du système, ou par
+des logiciels spécialisés comme TrueCrypt ou VeraCrypt sur Windows. Il permet de
+chiffrer et déchiffrer des partitions entières à la volée. Le disque, une fois
+déchiffré, peut-être montré comme n'importe quel autre espace de stockage. Son
+utilisation est totalement transparente pour l'utilisateur.
+\paragraph{}
+Dans des systèmes comme Linux ou FreeBSD, le chiffrement et déchiffrement du
+disque est réalisé directement par le noyau. Au moment de la lecture et de
+l'écriture du disque, les données passent par une couche supplémentaire
+(\textit{dm-crypt} pour Linux et \textit{GELI} pour FreeBSD) dont le rôle est de
+faire le lien entre les données chiffrées du disque et celle en claire visibles
+et utilisables par l'utilisateur.
+\paragraph{}
+Le fait que la lecture d'un disque soit faite par le noyau permet à un système
+utilisant cette méthode de chiffrer tout le système, à l'exception d'une petite
+partie permettant de déchiffrer le noyau au démarrage. Le reste du système peut
+ensuite être directement déchiffré par le noyau.
+
+\subsection{Chiffrement au niveau du système de fichiers}
+\paragraph{}
+Le chiffrement de système de fichier consiste en la création d'un système de
+fichier qui sera ensuite enregistré chiffré sur le disque. C'est nottament la
+technoligie utilisée par l'\textit{Encrypting File System} (abrégé EFS), une
+technologie Microsoft disponible dès la troisième version des systèmes de
+fichiers NTFS. D'autres solutions existent également, comme EncFS.
+\paragraph{}
+Le type de chiffrement a l'avantage de chiffrer toute une arborescence de
+fichiers indépendamment des autres fichiers présents sur le disque. Cela permet
+d'avoir différentes clés de chiffrement par système de fichiers chiffrés,
+contrairement au chiffrement de disque qui en impose une seule par partition.
+\paragraph{}
+Ce type de chiffrement peut cohabiter sur un système utilisant déjà le
+chiffrement de disque. Il ne permet en revanche pas de chiffrer des fichiers
+nécessaires au démarrage du système, contrairement à l'autre type de
+chiffrement.
+
 \section{Chiffrement de disque sur Linux et FreeBSD}
-\paragraph*{} A rédiger
+\paragraph{}
+Le chiffrement de disque sous Linux et FreeBSD est géré par des modules noyaux
+qui interviennent au moment de la lecture et l'écriture du disque. Les
+opérations qu'ils réalisent sont totalement transparentes du point de vue de
+l'utilisateur, qui ne manipule que des données en clair.
+\paragraph{}
+Le chiffrement sur les deux systèmes peut se faire sur des disques entiers, des
+partitions, des volumes RAID ou des volumes logiques (comme \textit{LVM}).
+Chacun des deux systèmes a accès à différents algorithmes implémentés dans le
+noyau et permettant le hachage et la chiffrement de données.
+\paragraph{Linux}
+Le module permettant de manipuler un disque chiffré sous Linux se nomme
+\textit{dm-crypt}. Ce module a été ajouté à l'infrastructure
+\textit{device-mapper} à la version 2.6 du noyau. Son appartenance à
+l'infrastructure \textit{device-mapper} lui permet d'être empilé avec d'autres
+modules de lecture et écriture de disque, comme ceux permettant de manipuler des
+disques simples, des partitions, des volumes RAID ou des volumes logiques tels
+que LVM.\\
+\\
+Le standard qui est actuellement le plus utilisé pour le chiffrement de disque
+est \textit{LUKS} (\textit{Linux Unified Key Setup}). Son but est de chiffrer
+intégralement le disque tout en le rendant utilisable sur d'autres plate-formes.
+Son implémentation est présente dans \textit{cryptsetup}, qui communique ensuite
+avec \textit{dm-crypt} et lui donne les paramètres nécessaire au chiffrement des
+volumes.
+\paragraph{FreeBSD}
+Le module permettant cette opération sous FreeBSD se nomme \textit{GELI}. Il
+appartient quant à lui à la classe \textit{GEOM}, qui contient tous les modules
+permettant de manipuler des disques. Tout comme pour inux, l'appartenance de ce
+module à l'infrastructure \textit{GEOM} lui permet d'être empilé avec d'autres
+modules spécialisés dans différentes tâches en rapport avec la lecture et
+l'écriture de disque.
+
 \subsection{Organisation dans le système d'exploitation}
 \paragraph{}
 Dans le cas de {\em Linux}, le chiffrement de disque est géré par le module 
