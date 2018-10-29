@@ -79,38 +79,36 @@ en place une spécification, \textit{Opal Storage Specification}, pour ce type d
 disques auto-chiffrés.
 
 \section{Chiffrement de disque sur Linux et FreeBSD}
+
 \paragraph{}
-Le chiffrement de disque sous Linux et FreeBSD est géré par des modules noyaux
-qui interviennent au moment de la lecture et l'écriture du disque. Les
-opérations qu'ils réalisent sont totalement transparentes du point de vue de
-l'utilisateur, qui ne manipule que des données en clair.
+Le chiffrement de disque sous Linux et FreeBSD est un chiffrement à la volée. Il
+est géré par des modules noyaux qui interviennent au moment de la lecture et
+l'écriture du disque. Les opérations qu'ils réalisent sont totalement
+transparentes du point de vue de l'utilisateur, qui ne manipule que des données
+en clair.
 \paragraph{}
-Le chiffrement sur les deux systèmes peut se faire sur des disques entiers, des
-partitions, des volumes RAID ou des volumes logiques (comme \textit{LVM}).
 Chacun des deux systèmes a accès à différents algorithmes implémentés dans le
-noyau et permettant le hachage et la chiffrement de données.
+noyau et permettant le hachage et la chiffrement de données. Le chiffrement sur
+les deux systèmes peut se faire sur des disques entiers, des partitions
+physiques ou logiques (comme LVM), des volumes RAID, la RAM, ...
 \paragraph{Linux}
 Le module permettant de manipuler un disque chiffré sous Linux se nomme
 \textit{dm-crypt}. Ce module a été ajouté à l'infrastructure
-\textit{device-mapper} à la version 2.6 du noyau. Son appartenance à
-l'infrastructure \textit{device-mapper} lui permet d'être empilé avec d'autres
-modules de lecture et écriture de disque, comme ceux permettant de manipuler des
-disques simples, des partitions, des volumes RAID ou des volumes logiques tels
-que LVM.\\
+\textit{device-mapper} à la version 2.6 du noyau.\\
 \\
 Le standard qui est actuellement le plus utilisé pour le chiffrement de disque
-est \textit{LUKS} (\textit{Linux Unified Key Setup}). Son but est de chiffrer
-intégralement le disque tout en le rendant utilisable sur d'autres plate-formes.
-Son implémentation est présente dans \textit{cryptsetup}, qui communique ensuite
-avec \textit{dm-crypt} et lui donne les paramètres nécessaire au chiffrement des
-volumes.
+est \textit{LUKS} (\textit{Linux Unified Key Setup}\cite{onDiskFormatLuks}). Son
+rôle est de chiffrer intégralement un volume tout en le rendant utilisable par
+d'autres plate-formes.
 \paragraph{FreeBSD}
-Le module permettant cette opération sous FreeBSD se nomme \textit{GELI}. Il
-appartient quant à lui à la classe \textit{GEOM}, qui contient tous les modules
-permettant de manipuler des disques. Tout comme pour inux, l'appartenance de ce
-module à l'infrastructure \textit{GEOM} lui permet d'être empilé avec d'autres
-modules spécialisés dans différentes tâches en rapport avec la lecture et
-l'écriture de disque.
+Le module permettant cette opération sous FreeBSD se nomme \textit{GELI},
+remplaçant l'ancien module \textit{GBDE}. Il appartient à la classe
+\textit{GEOM}, qui contient l'ensemble des modules permettant de manipuler des
+disques et autres volumes.\\
+\\
+Contrairement à \textit{dm-crypt} qui peut accepter des paramètres correspondant
+à différents standards (non limités à LUKS), le seul standard disponible pour
+le chiffrement de volume avec \textit{GELI} est celui ce \textit{GELI} lui-même.
 
 \subsection{Organisation dans le système d'exploitation}
 \paragraph{}
@@ -120,7 +118,7 @@ noyau {\em dm-crypt}, qui est un module qui dépend du module plus général
 (RAID, LVM, Cache, ...).
 Le module {\em dm-crypt} gère la table appelée {\em crypt table}
 qui permet d'associer un device à un chiffrement notamment. La table permet
-la lecture des données sur le disque. A celà s'ajoute le programme 
+la lecture des données sur le disque. À celà s'ajoute le programme 
 {\em cryptsetup} qui permet de lire des métadonnées stockées sur le disque 
 pour remplir la {\em crypt table}.
 Le programme s'occupe notamment du déchiffrement de la clé, de 
@@ -147,8 +145,8 @@ le module s'appuie sur l'API de cryptographie du noyau.
 \paragraph{}
 Dans le cas de {\em FreeBSD}, le module noyau qui est en charge des
 transformations sur les disques est {\em GEOM}. Comme sous {\em Linux}, 
-il existe des modules qui vont interagir avec GEOM pour fournir des fonction 
-de RAID, de cache, et également de chiffrement. 
+il existe des modules qui vont interagir avec {\em GEOM} pour fournir des 
+fonction de RAID, de cache, et également de chiffrement. 
 Ces modules sont appelés {\em Classes GEOM}, 
 celle qui fournit le chiffrement est nommée {\em ELI}, le module noyau associé 
 est ainsi appelé {\em GELI}. Le module contrairement à {\em dm-crypt}, 
