@@ -16,17 +16,22 @@ gérant le chiffrement de volume afin de porter le standard
 \subsection{Chiffrement matériel}
 \paragraph{}
 Le chiffrement matériel (\textit{Hardware-based full disk encryption},
-\textit{FDE}) concerne certains disques (appelés \textit{Self-encrypting drive})
-ou autres espaces de stockage. Leur fonctionnement est basé sur le contrôleur
-du disque qui gère les clés de chiffrement, et œuvrant indépendamment du 
-processeur. L'authentification se fait alors avec un via un logiciel 
-s'exécutant avant le démarrage du système ou mot de passe dans le BIOS.
+\textit{FDE}) concerne de nombreux disques durs (\textit{HDD}) et de plus en
+plus de \textit{SSD}, alors appelés \textit{Self-encrypting drive} (ou
+\textit{SED}). L'implémentation suit généralement la spécification \textbf{OPAL
+  2.0} mise en place par le \textit{Trusted Computing Group}, réunissant
+plusieurs fabricants d'espaces de stockage.
 \paragraph{}
-Le groupe \textbf{Trusted Computing Group} réunissant plusieurs fabricants a mis
-en place une spécification, \textit{Opal Storage Specification}, pour ce type de
-disques auto-chiffrés.
+L'opération est directement réalisée par le contrôleur du disque qui œuvre
+indépendamment du processeur. Il contient une clé de chiffrement servant à
+chiffrer et déchiffrer le contenu du disque. Dès que le disque est alimenté,
+cette clé est déchiffrée par ce contrôleur à l'aide d'une phrase secrète qui lui
+est passée par un logiciel s'exécutant avant le démarrage du système ou via mot
+de passe dans le BIOS. Cela donne la possibilité à l'utilisateur de modifier sa
+phrase secrète sans risquer de perdre ses données ou devoir rechiffrer ses
+données.
 
-\subsection{Chiffrement à la volée}
+\subsection{Chiffrement de disque logiciel}
 \paragraph{}
 Le chiffrement de disque est généralement géré par le noyau du système, ou par
 des logiciels spécialisés comme TrueCrypt ou VeraCrypt sur Windows. Il permet de
@@ -48,15 +53,16 @@ ensuite être directement déchiffré par le noyau.
 
 \subsection{Chiffrement au niveau du système de fichiers}
 \paragraph{}
-Le chiffrement de système de fichiers consiste à confier le rôle de chiffrement
-et déchiffrement au sytème de fichiers, qui peut alors chiffrer les fichiers, 
-leurs métadonnées, l'arborescence, selon les implémentations. 
-C'est notamment la technologie utilisée par l'\textit{Encrypting File System}
-(abrégé EFS), une technologie Microsoft disponible dès la troisième version 
-des systèmes de fichiers NTFS. 
-D'autres solutions existent également, comme EncFS. Des logiciels
-comme TrueCrypt/VeraCrypt permettent également de réaliser ce genre
-d'opérations, en chiffrant des fichiers dans un conteneur.
+Le chiffrement de système de fichiers, ou système de fichiers chiffré, consiste
+à confier le rôle de chiffrement et déchiffrement au sytème de fichiers, qui
+peut alors chiffrer les fichiers, leurs métadonnées ainsi que l'arborescence,
+selon les implémentations. Ce type de système de fichier chiffre alors
+automatiquement les fichiers qui y sont stockés; le chiffrement se fait à la
+volée. C'est notamment la technologie utilisée par l'\textit{Encrypting File
+  System} (abrégé EFS), une technologie Microsoft disponible dès la troisième
+version des systèmes de fichiers NTFS. D'autres solutions existent également,
+comme EncFS. Des logiciels comme TrueCrypt/VeraCrypt permettent également de
+réaliser ce genre d'opérations, en chiffrant des fichiers dans un conteneur.
 \paragraph{}
 Ce type de chiffrement a l'avantage de chiffrer toute une arborescence de
 fichiers indépendamment des autres fichiers présents sur le disque. Cela permet
