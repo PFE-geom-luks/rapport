@@ -1,0 +1,171 @@
+\section{Analyse de GELI}
+
+\paragraph
+On constate donc que {\em LUKS} standardise le format sur disque et restreint 
+les algorithmes possibles. Les différences avec {\em GELI} se trouvent donc 
+sur le format des métadonnées sur le disque, les algorithmes disponibles.
+{\em LUKS} ne prévoit pas l'authentification des données 
+contrairement à {\em GELI}.
+
+On peut donc partir du code source de GELI et essayer d'adapter pour pouvoir 
+utiliser le format {\em LUKS}.
+
+\subsection{Analyse des fichiers sources de \em GELI}
+\subsubsection{Module noyau : sys/geom/eli/}
+\paragraph{g\_eli.c}
+\begin{itemize}
+	\item fetch\_loader\_passphrase : récupère la phrase de passe depuis 
+		l'environnement noyau qui a été insérée par le loader 
+		(utile pour démarrer sur une partition chiffrée)
+	\item zero\_boot\_passcache : rempli de zero la phrase de passe cachée par le 
+		système
+	\item zero\_geli\_intake\_keys : rempli de zero le buffer de clés
+	\item zero\_intake\_passcache : appelle les deux fonctions précédentes
+	\item g\_eli\_crypto\_rerun : relance les opérations de chiffrement (EAGAIN from
+		crypto(9) )
+	\item g\_eli\_getattr\_done : 
+	\item g\_eli\_read\_done : appellée lorsque les données chiffrée sont lues sur le 
+		fournisseur (disque), elle appelle si tout c'est bien passé la partie
+		qui va déchiffrer (en ajoutant à une queue les données à déchiffrer)
+	\item g\_eli\_write\_done : appellée lorsque les données ont été écrites sur le 
+		disque
+	\item g\_eli\_orphan\_spoil\_assert : déclenche une panique noyau (ne devrait pas
+		être appellée)
+	\item g\_eli\_orphan : appellée quand l'un des parents de l'instance g\_eli 
+		devient absent, appelle g\_eli\_destroy si les métadonnées sont présentes
+	\item g\_eli\_start : appellée lorsque on commence une lecture ou écriture, 
+		filtre les IO (READ,WRITE,GETATTR,FLUSH, etc)
+	\item g\_eli\_newsession : initialise les fonctions de chiffrements (workers)
+	\item g\_eli\_freesession : libère les fonctions de chiffrement noyau (workers)
+	\item g\_eli\_cancel : renvoie ENXIO : pas de tel adresse ou matériel: empèche
+		la création de nouvelles IO
+	\item g\_eli\_takefirst : prise des IO dans la queue (vérifie que le disque n'est
+		pas suspendu)
+	\item g\_eli\_worker : fonction principale du thread worker noyau quand il n'y a
+		pas d'accélération matérielle.
+	\item g\_eli\_read\_metadata : lis les métadonnées sur le disque
+	\item g\_eli\_last\_close :
+	\item g\_eli\_access : gère les droits d'accès (lecture, écriture, exclusivité)
+	\item g\_eli\_cpu\_is\_disabled
+	\item g\_eli\_create : initialise l'instance geli (lecture des métadonnées, etc)
+		créé le disque déchiffré
+	\item g\_eli\_destroy : supprime le disque déchiffré
+	\item g\_eli\_destroy\_geom : appelle la fonction précédente
+	\item g\_eli\_keyfiles\_load : charge les keyfiles
+	\item g\_eli\_keyfiles\_clear : supprime les keyfiles de la mémoire vive
+	\item g\_eli\_taste : fonction de détection d'un partition GELI que l'on réussi à
+		ouvrir : la phrase de passe et/ou keyfiles sont corrects
+	\item g\_eli\_dumpconf : permet à l'utilisateur de connaître des données sur 
+		l'instance actuelle : version, algorithmes, etc
+	\item g\_eli\_shutdown\_pre\_sync : 
+	\item g\_eli\_init : enregistre l'événement shutdown qui déclenche la fonction
+		précédente
+	\item g\_eli\_fini : enlève l'événement shutdown
+\end{itemize}
+
+\paragraph{g\_eli.h}
+\begin{itemize}
+	\item eli\_metadata\_encode\_v*
+	\item eli\_metadata\_decode\_v*
+	\item eli\_metadata\_decode,eli\_metadata\_encode : choisi la bonne fonction pour 
+		respectivement le décodage et l'encodage des métadonnées
+	\item g\_eli\_str2ealgo : convertie une chaine de caractère en algorithme de 
+		chiffrement
+	\item g\_eli\_str2aalgo : convertie une chaine de caractère en algorithme 
+		d'authentification
+	\item g\_eli\_keylen : retourne la longueur de la clé selon l'algorithme choisi
+	\item g\_eli\_hashlen : retourne la longeur du hash selon l'algorithme utilisé
+	\item eli\_metadata\_softc : rempli les données privées de l'instance geli 
+		selon les métadonnées extraites du disque
+\end{itemize}
+
+\paragraph{g\_eli\_crypto.c}
+\begin{itemize}
+	\item g\_eli\_crypto\_done : 
+	\item g\_eli\_crypto\_cipher : création du worker qui s'occupe du 
+		chiffrement
+	\item g\_eli\_crypto\_encrypt, g\_eli\_crypto\_decrypt : 
+		renvoie la fonction de chiffrement pour les métadonnées
+\end{itemize}
+
+\paragraph{g\_eli\_ctl.c}
+\begin{itemize}
+	\item g\_eli\_ctl\_attach : ouvrir un volume {\em GELI}
+	\item g\_eli\_find\_device : renvoie les données du module noyau 
+		associé au disque /dev/sdAN
+	\item g\_eli\_ctl\_detach : ferme un volume {\em GELI}
+	\item g\_eli\_ctl\_onetime : créée un volume {\em GELI} avec une clé
+		aléatoire
+	\item g\_eli\_ctl\_configure : configure les différentes options des
+		volumes chiffrés avec {\em GELI}
+	\item g\_eli\_ctl\_setkey : change la clé de chiffrement des 
+		métadonnées.
+	\item g\_eli\_ctl\_delkey : supprime une clé de chiffrement des 
+		métadonnées
+	\item g\_eli\_suspend\_one : suspend le volume chiffré
+	\item g\_eli\_ctl\_suspend : suspend le volume chiffré en appelant la 
+		fonction précédente
+	\item g\_eli\_ctl\_resume : reprend un volume chiffré
+	\item g\_eli\_kill\_one : supprime les métadonnées sur le disque
+	\item g\_eli\_ctl\_kill : supprime les métadonnées sur le disque en 
+		appelant la fonction précédente
+	\item g\_eli\_config : interprète la commande passée
+\end{itemize}
+\paragraph{g\_eli\_hmac.c}
+\begin{itemize}
+	\item g\_eli\_crypto\_hmac\_init : initialisation du HMAC
+	\item g\_eli\_crypto\_hmac\_update : passage des données à l'algorithme
+		de HMAC
+	\item g\_eli\_crypto\_hmac\_final : réalise les dernière opérations 
+		pour calculer le HMAC
+	\item g\_eli\_crypto\_hmac : réalise le HMAC des données en appelant 
+		les 3 fonctions précédentes
+	\item g\_eli\_crypto\_ivgen : génère un vecteur d'initialisation unique
+		pour chaque secteur
+\end{itemize}
+
+\paragraph{g\_eli\_integrity.c}
+Le code source de ce fichier est uniquement utile pour les volumes chiffrés qui
+authentifient également les données pour pouvoir vérifier leur intégrité.
+Il ne nous est donc pas utile pour porter LUKS.
+\paragraph{g\_eli\_key.c}
+\begin{itemize}
+	\item g\_eli\_mkey\_verify : vérifie que la clé maitres est la bonne en
+		la comparant au HMAC trouvé sur le disque.
+	\item g\_eli\_mkey\_hmac : calcule le HMAC de la clé des données et des
+		vecteurs d'initialisation.
+	\item g\_eli\_mkey\_decrypt : déchiffre la clé maitre
+	\item g\_eli\_mkey\_encrypt : chiffre la clé maitre
+	\item g\_eli\_mkey\_propagate : initialise les clé de chiffrements
+\end{itemize}
+\paragraph{g\_eli\_key\_cache.c}
+\begin{itemize}
+	\item g\_eli\_key\_cmp : compare deux clés
+	\item g\_eli\_key\_fill : 
+	\item g\_eli\_key\_allocate : alloue une clé de chiffrement et la 
+		stocke dans une arbre et une queue
+	\item g\_eli\_key\_find\_last : renvoie la dernière clé ajoutée
+	\item g\_eli\_key\_replace : remplace une clé dans la queue et l'arbre
+	\item g\_eli\_key\_remove : supprime la clé de la queue et de l'arbre
+	\item g\_eli\_key\_init : initialise l'arbre et la queue
+	\item g\_eli\_key\_destroy : spprime l'arbre et la queue
+	\item g\_eli\_key\_hold : met une clé de chiffrement dans le cache
+	\item g\_eli\_key\_drop : appelle la fonction g\_eli\_key\_remove
+\end{itemize}
+
+\paragraph{g\_eli\_privacy.c}
+\begin{itemize}
+	\item g\_eli\_crypto\_read\_done : récupère la donnée déchiffrée, et la
+		renvoie
+	\item g\_eli\_crypto\_write\_done : renvoie les données chiffrées 
+		au disque pour écriture
+	\item g\_eli\_crypto\_read : lance la lecture sur le disque
+	\item g\_eli\_crypto\_run : chiffre ou déchiffre des données
+\end{itemize}
+
+\paragraph{pkcs5v2.c}
+\begin{itemize}
+	\item
+	\item
+	\item
+\end{itemize}
