@@ -1,6 +1,6 @@
 \section{Analyse de GELI}
 
-\paragraph
+\paragraph{}
 On constate donc que {\em LUKS} standardise le format sur disque et restreint 
 les algorithmes possibles. Les différences avec {\em GELI} se trouvent donc 
 sur le format des métadonnées sur le disque, les algorithmes disponibles.
@@ -168,4 +168,39 @@ Il ne nous est donc pas utile pour porter LUKS.
 	\item
 	\item
 	\item
+\end{itemize}
+\subsubsection{Utilitaire espace utilisateur : sbin/geom/class/eli}
+\paragraph{geom\_eli.c}
+\begin{itemize}
+	\item eli\_protect : désactive les core dump et le swapping
+	\item eli\_main : analyse la syntaxe des commandes
+	\item eli\_is\_attached : vérifie si le volume est ouvert
+	\item eli\_genkey\_files : 
+	\item eli\_genkey\_passphrase\_prompt : demande la phrase de passe à
+		l'utilisateur
+	\item eli\_genkey\_passphrase :
+	\item eli\_genkey :
+	\item eli\_metadata\_read :
+	\item eli\_metadata\_store :
+	\item eli\_init :
+	\item eli\_attach :
+	\item eli\_configure\_detached :
+	\item eli\_configure :
+	\item eli\_setkey\_attached :
+	\item eli\_setkey\_detached :
+	\item eli\_setkey :
+	\item eli\_delkey\_attached :
+	\item eli\_delkey\_detached :
+	\item eli\_delkey :
+	\item eli\_resume :
+	\item eli\_trash\_metadata :
+	\item eli\_kill\_detached :
+	\item eli\_kill :
+	\item eli\_backup\_create :
+	\item eli\_backup :
+	\item eli\_restore :
+	\item eli\_resize :
+	\item eli\_version :
+	\item eli\_clear :
+	\item eli\_dump :
 \end{itemize}
