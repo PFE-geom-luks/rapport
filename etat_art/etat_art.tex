@@ -245,6 +245,16 @@ Les algorithmes de chiffrement disponibles pour {\em GELI} \cite{geli.h} sont :
 	\item 3DES-CBC
 \end{itemize}
 
+Cependant {\em GELI} profite des fonctions de chiffrement grâce à l'API noyau,
+opencrypto, qui permet donc également d'utiliser les algorithmes suivants:
+\begin{itemize}
+	\item{CAST5-CBC}
+	\item{SKIPJACK-CBC}
+	\item{ARC4}
+	\item{AES-ICM}
+	\item{AES-GCM}
+\end{itemize}
+
 \paragraph{}
 Dans le cas de {\em LUKS}, la spécification \cite{onDiskFormatLuks} précise
 la liste des algorithmes disponibles, les noms des algorithmes ne sont pas 
@@ -265,6 +275,16 @@ Les algorithmes peuvent être associés aux modes suivants :
 	\item CBC-essiv:hash
 	\item XTS-plain64
 \end{itemize}
+
+\paragraph{}
+On a donc la liste suivante qui peut être implémentée sur FreeBSD en utilisant 
+l'API opencrypto :
+\begin{itemize}
+	\item{AES-CBC}
+	\item{AES-XTS}
+	\item{CAST5-CBC}
+\end{itemize}
+
 
 \subsubsection{Utilisation de la clé primaire}
 \paragraph{}
