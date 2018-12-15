@@ -1,4 +1,12 @@
+# latexmk
 rapport.aux
+rapport.bbl
+rapport.blg
+rapport.fdb_latexmk
+rapport.fls
 rapport.log
 rapport.pdf
 rapport.toc
+
+# emacs auto
+*.el

@@ -1,0 +1,47 @@
+\chapter{Description du projet}
+
+L'analyse de \textit{LUKS} et \textit{GELI} nous a montré les similutudes et
+différences que présentent ces deux systèmes.
+
+\section{Lecture des métadonnées}
+\paragraph{}
+Pour n'importe-quel module noyau utilisant la classe \textit{GEOM} de
+\textit{FreeBSD}, les métadonnées sont toujours placées à la fin des données du
+disque, contrairement à \textit{LUKS}. Il faut donc créer les fonctions
+utilisant celles fournies par \textit{GEOM} afin de réaliser cette opération.
+\paragraph{}
+Dans le cas d'un fichier, il suffit d'utiliser les fonctions standards de
+\verb|C| et de lire le début du fichier. Dans le cas d'un disque en revanche, il
+faut créer une fonction lisant les premiers secteurs. On peut ensuite les
+stocker dans une structure afin de connaître les propriétés de chiffrement
+utilisées.
+
+\section{Utilisation des métadonnées}
+\paragraph{}
+Les informations présentes dans les métadonnées \textit{LUKS} sont assez proches
+de celles de \textit{GELI}:
+\begin{itemize}
+\item le \textit{MAGIC}
+\item la version utilisée
+\item l'algorithme de chiffrement
+\item l'algorithme de hashage
+\item le sel
+\item le nombre d'itérations PKCS
+\item la \textit{masterkey} chiffrée
+\end{itemize}
+D'autres paramètres comme la longueur de clé ou le type de vecteur
+d'initialisation \textit{IV} sont dépendant des spécification \textit{LUKS} ou
+\textit{GELI}.
+\paragraph{}
+Écrire un module noyau de toute pièce capable d'utiliser un disque chiffré avec
+\textit{LUKS} serait une tâche très longue. Sachant que de nombreuses fonction
+s'inspireraient du module \textit{GELI}, il est préférable de copier le code
+(sous license \underline{BSD-2-Clause-FreeBSD}) et de l'adapter à la lecture et
+l'écriture de données sur un disque chiffré \textit{LUKS}. Cependant, les
+fonctions étant extrêmenent dépendantes de la structure des métadonnées, leur
+modification équivaudrait à une refonte entière du code.
+\paragraph{}
+C'est pourquoi, la solution la plus intéressante serait de garder la structure
+de \textit{GELI} et d'y mettre les informations de chiffrement
+Il faudra toutefois faire attention à l'emplacement des métadonnées sur le
+disque qui change entre les deux spécifications.
