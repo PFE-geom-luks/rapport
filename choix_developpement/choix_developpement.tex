@@ -70,7 +70,9 @@ modification équivaudrait à une refonte assez importante du code.
 C'est pourquoi, la solution la plus intéressante serait de garder la structure
 de \textit{GELI} et d'y mettre les informations de chiffrement. Cela permettra 
 notamment d'écrire et/ou de modifier moins de code et donc de limiter les erreurs
-et de faciliter la maintenabilité. On choisit donc de conserver le code de 
+et de faciliter la maintenabilité. De plus en choisissant de procéder ainsi, on
+peut modifier le code facilement par itérations en le gardant compilable et 
+exécutable. On choisit donc de conserver le code de 
 GELI le plus possible et de transformer les métadonnées de LUKS en métadonnées 
 GELI.
 
@@ -107,7 +109,15 @@ dernier secteur. On devra également changer la gestion du déchiffrement de la
 clé du disque.
 
 
-\subsubsection{Déchiffrement de la clé de chiffrement}
+\subsubsection{Déchiffrement de la clé de chiffrement dans le cas de GELI}
+Dans le cas de GELI, le code prévoit le déchiffrement de la clé de chiffrement 
+dans le noyau, de façon à pouvoir déchiffrer le disque au démarrage (pour 
+pouvoir avec un volume racine chiffré). Plus précisément l'utilitaire en espace
+utilisateur envoie au noyau via l'API de GEOM, la phrase de passe dérivée via 
+l'algorithme PKCS5v2 en prenant SHA512 comme fonction pseudo aléatoire.
+
+
+\subsubsection{Déchiffrement de la clé de chiffrement dans le cas de LUKS}
 \paragraph{}
 On a donc besoin de déchiffrer la clé de chiffrement stockée dans l'en-tête LUKS.
 Pour cela il faut tout d'abord bien comprendre comment est stockée la clé de 
@@ -131,6 +141,5 @@ Enfin le résultat de la fragmentation est chiffrée selon l'algorithme utilisé
 pour les données du disque (donc précisé par les champs {\em cipher-name} et 
 {\em cipher-mode}) avec comme clé le résultat de la dérivation de la phrase de
 passe.
-
 
 
