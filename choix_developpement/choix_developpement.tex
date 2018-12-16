@@ -4,13 +4,40 @@
 \subsection{Utilisation des métadonnées stockées sur le disque dans le code
 source de GELI}
 \label{ssec:md_usage}
-
+L'analyse de \textit{LUKS} et \textit{GELI} nous a montré les similutudes et
+différences que présentent ces deux systèmes.
 \paragraph{}
 \begin{figure}[h]
 \centering
 \includegraphics[width=.6\linewidth]{choix_developpement/utilisation_metadonnee.png}
 \caption{\label{fig:softc_eli}Métadonnées en mémoire}
 \end{figure}
+
+\paragraph{}
+Pour n'importe-quel module noyau utilisant la classe \textit{GEOM} de
+\textit{FreeBSD}, les métadonnées sont toujours placées à la fin des données du
+disque, contrairement à \textit{LUKS}. Il faut donc créer les fonctions
+utilisant celles fournies par \textit{GEOM} afin de réaliser cette opération.
+\paragraph{}
+Dans le cas d'un fichier (utile pour sauvegarder l'en-tête contenant les 
+métadonnées), il suffit d'utiliser les fonctions standards de
+\verb|C| et de lire le début du fichier. Dans le cas d'un disque en revanche, il
+faut créer une fonction lisant les premiers secteurs. On peut ensuite les
+stocker dans une structure afin de connaître les propriétés de chiffrement
+utilisées.
+
+\paragraph{}
+Les informations présentes dans les métadonnées \textit{LUKS} sont assez proches
+de celles de \textit{GELI}:
+\begin{itemize}
+\item le \textit{MAGIC}
+\item la version utilisée
+\item l'algorithme de chiffrement
+\item l'algorithme de hashage
+\item le sel
+\item le nombre d'itérations PKCS
+\item la \textit{masterkey} chiffrée
+\end{itemize}
 
 \paragraph{}
 Les métadonnées sont donc stockées sur le disque et sont mappées en mémoire via
@@ -30,10 +57,20 @@ queue.
 \subsection{Transformer les métadonnées de LUKS en métadonnées GELI}
 \subsubsection{Principe général}
 \paragraph{}
-Comme l'utilisation des métadonnées de GELI est présente dans beaucoup de 
-fonctions que ce soit directement ou à travers la structure {\em softc} qui 
-désigne les données privées de l'instance GEOM. Pour modifier le moins de code 
-possible et donc limiter les erreurs, on peut choisir de conserver le code de 
+Écrire un module noyau de toute pièce capable d'utiliser un disque chiffré avec
+\textit{LUKS} serait une tâche très longue. Sachant que de nombreuses fonctions
+s'inspireraient du module \textit{GELI}, il est préférable de copier le code
+(sous license \underline{BSD-2-Clause-FreeBSD}) et de l'adapter à la lecture et
+l'écriture de données sur un disque chiffré \textit{LUKS}. Cependant, les
+fonctions étant extrêmement dépendantes de la structure des métadonnées, 
+que ce soit directement ou à travers la structure {\em softc} (qui 
+désigne les données privées de l'instance GEOM), leur
+modification équivaudrait à une refonte assez importante du code.
+\paragraph{}
+C'est pourquoi, la solution la plus intéressante serait de garder la structure
+de \textit{GELI} et d'y mettre les informations de chiffrement. Cela permettra 
+notamment d'écrire et/ou de modifier moins de code et donc de limiter les erreurs
+et de faciliter la maintenabilité. On choisit donc de conserver le code de 
 GELI le plus possible et de transformer les métadonnées de LUKS en métadonnées 
 GELI.
 
