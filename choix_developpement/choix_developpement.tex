@@ -63,11 +63,12 @@ s'inspireraient du module \textit{GELI}, il est préférable de reprendre le cod
 (sous license \underline{BSD-2-Clause-FreeBSD}) et de l'adapter à la lecture et
 l'écriture de données sur un disque chiffré \textit{LUKS}. Cependant, les
 fonctions étant extrêmement dépendantes de la structure des métadonnées, dont
-l'utilisation globale est visible sur la \textit{Figure \ref{fig:fonctions_md}}.
-Cette utilisation se fait également à travers la structure \texttt{softc}
-(\textit{Figure \ref{fig:fonctions_sc}}), qui désigne les données privées de
-l'instance GEOM. Leur modification équivaudrait à une refonte assez importante
-du code.
+l'usage globale est visible sur la \textit{Figure \ref{fig:fonctions_md}};
+19.35\% des fonctions dépendent de cette structure. Cette utilisation se fait
+également à travers la structure \texttt{softc}, utilisée par 44.09\% des
+fonctions (\textit{Figure \ref{fig:fonctions_sc}}), qui désigne les données
+privées de l'instance GEOM. Leur modification équivaudrait à une refonte assez
+importante du code.
 \paragraph{}
 \begin{figure}[h]
 \centering
