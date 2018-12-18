@@ -4,7 +4,7 @@
 \subsection{Utilisation des métadonnées stockées sur le disque dans le code
 source de GELI}
 \label{ssec:md_usage}
-L'analyse de \textit{LUKS} et \textit{GELI} nous a montré les similutudes et
+L'analyse de \textit{LUKS} et \textit{GELI} nous a montré les similitudes et
 différences que présentent ces deux systèmes.
 \paragraph{}
 \begin{figure}[h]
@@ -66,6 +66,18 @@ fonctions étant extrêmement dépendantes de la structure des métadonnées,
 que ce soit directement ou à travers la structure {\em softc} (qui 
 désigne les données privées de l'instance GEOM), leur
 modification équivaudrait à une refonte assez importante du code.
+\paragraph{}
+\begin{figure}[h]
+\centering
+\includegraphics[width=.9\linewidth]{choix_developpement/fonctions_g_luks_metadata.png}
+\caption{\label{fig:fonctions_md}Fonctions utilisant les métadonnées}
+\end{figure}
+\paragraph{}
+\begin{figure}[h]
+\centering
+\includegraphics[width=.9\linewidth]{choix_developpement/fonctions_g_luks_softc.png}
+\caption{\label{fig:fonctions_sc}Fonctions utilisant la structure \texttt{softc}}
+\end{figure}
 \paragraph{}
 C'est pourquoi, la solution la plus intéressante serait de garder la structure
 de \textit{GELI} et d'y mettre les informations de chiffrement. Cela permettra 
