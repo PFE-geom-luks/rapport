@@ -128,7 +128,7 @@ clé du disque.
 Dans le cas de GELI, le code prévoit le déchiffrement de la clé de chiffrement 
 dans le noyau, de façon à pouvoir déchiffrer le disque au démarrage (pour 
 pouvoir avec un volume racine chiffré). Plus précisément l'utilitaire en espace
-utilisateur envoie au noyau via l'API de GEOM, la phrase de passe dérivée via 
+utilisateur envoie au noyau via l'API de GEOM, la phrase de passe dérivée via
 l'algorithme PKCS5v2 en prenant SHA512 comme fonction pseudo aléatoire.
 
 
@@ -157,4 +157,41 @@ pour les données du disque (donc précisé par les champs {\em cipher-name} et
 {\em cipher-mode}) avec comme clé le résultat de la dérivation de la phrase de
 passe.
 
-
+\subsubsection{Détection de l'algorithme de chiffrement}
+\paragraph{}
+Deux données importantes sont nécessaires pour le chiffrement et déchiffrement
+de disque: l'algorithme de chiffrement utilisé ainsi que la méthode de
+génération du vecteur d'initialisation \texttt{IV}. Dans notre cas, l'algorithme
+de chiffrement peut être \textbf{aes-xts}, \textbf{aes-cbc} ou
+\textbf{cast5-cbc}. Chacun de ces algorithmes n'accepte pas les même méthodes de
+génération de l'\texttt{IV}, qui peut être de type \textit{plain} (32 ou 64) ou
+\textit{essiv:sha256}. Le vecteur d'unitialisation est unique à chaque secteur
+du volume chiffré. Le premier type prend numéro du secteur concerné codé sur 32
+ou 64 bits comme vecteur d'initialisation, tandis que \textit{essiv:sha256}
+(pour \textbf{e}ncrypted \textbf{s}ector-\textbf{s}alt \textbf{i}nitialization
+\textbf{v}ector) calcule l'IV à partir d'une combinaison du numéro de secteur
+avec le hachage de la clé de chiffrement.
+\paragraph{}
+\begin{figure}[h]
+\centering
+\includegraphics[width=.9\linewidth]{choix_developpement/aes_cbc.png}
+\caption{\label{fig:aes_cbc}Chiffrement en AES-CBC}
+\end{figure}
+\paragraph{}
+Dans les métadonnées \textit{LUKS}, deux champs distincts permettent à
+\textit{dm-crypt} de connaitre l'algorithme de chiffrement utilisé ainsi que la
+manière dont le vecteur d'initialisation \texttt{IV} est calculé:
+\begin{itemize}
+\item \textbf{Cipher name}: nom de l'algorithme de chiffrement utilisé
+\item \textbf{Cipher mode}: manière dont le vecteur d'initialisation est généré
+\end{itemize}
+\paragraph{}
+Dans les métadonnées \textit{GELI}, ces deux informations sont confondues dans
+le champs \textbf{ealgo} (\textit{encryption algorithm}). Le calcul de
+\texttt{IV} est ensuite géré par la fonction \texttt{g\_eli\_crypto\_ivgen}, qui
+est soit en mode \textit{plain64} lorsque l'algorithme \textbf{aes-xts} est
+utilisé, et \textit{essiv:sha256} autrement.
+\paragraph{}
+Il est donc nécessaire d'adapter la fonction afin qu'elle prenne en compte les
+propriétés indiquées dans les métadonnées \textit{LUKS} lorsqu'elles sont mises
+au format \textit{GEOM ELI}.
