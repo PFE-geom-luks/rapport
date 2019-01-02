@@ -157,14 +157,14 @@ pour les données du disque (donc précisé par les champs {\em cipher-name} et
 {\em cipher-mode}) avec comme clé le résultat de la dérivation de la phrase de
 passe.
 
-\subsubsection{Détection de l'algorithme de chiffrement}
+\subsubsection{Sélection des algorithmes utilisés}
 \paragraph{}
 Deux données importantes sont nécessaires pour le chiffrement et déchiffrement
 de disque: l'algorithme de chiffrement utilisé ainsi que la méthode de
-génération du vecteur d'initialisation \texttt{IV}. Dans notre cas, l'algorithme
+génération du vecteur d'initialisation \textbf{IV}. Dans notre cas, l'algorithme
 de chiffrement peut être \textbf{aes-xts}, \textbf{aes-cbc} ou
 \textbf{cast5-cbc}. Chacun de ces algorithmes n'accepte pas les même méthodes de
-génération de l'\texttt{IV}, qui peut être de type \textit{plain} (32 ou 64) ou
+génération de l'\textbf{IV}, qui peut être de type \textit{plain} (32 ou 64) ou
 \textit{essiv:sha256}. Le vecteur d'unitialisation est unique à chaque secteur
 du volume chiffré. Le premier type prend numéro du secteur concerné codé sur 32
 ou 64 bits comme vecteur d'initialisation, tandis que \textit{essiv:sha256}
@@ -187,11 +187,39 @@ manière dont le vecteur d'initialisation \texttt{IV} est calculé:
 \end{itemize}
 \paragraph{}
 Dans les métadonnées \textit{GELI}, ces deux informations sont confondues dans
-le champs \textbf{ealgo} (\textit{encryption algorithm}). Le calcul de
-\texttt{IV} est ensuite géré par la fonction \texttt{g\_eli\_crypto\_ivgen}, qui
-est soit en mode \textit{plain64} lorsque l'algorithme \textbf{aes-xts} est
+le champs \textbf{ealgo} (\textit{encryption algorithm}). La variable est
+ensuite enregistrée et utilisée dans la structure \texttt{softc}. Le calcul de
+\textbf{IV} quant à lui est géré par la fonction \texttt{g\_eli\_crypto\_ivgen},
+qui est soit en mode \textit{plain64} lorsque l'algorithme \textbf{aes-xts} est
 utilisé, et \textit{essiv:sha256} autrement.
+\paragraph{}
+Par défaut, le type d'\textbf{IV} (le \texttt{cipher mode} dans \textit{LUKS})
+calculé par la fonction de \textit{GELI} dépend de l'algorithme de chiffrement
+(le \textit{cipher name} dans \textit{LUKS}). Cette y association est codée en
+dur:
+\begin{itemize}
+\item le calcul de l'\textbf{IV} est équivalent au mode \texttt{plain64} de
+  \textit{LUKS} lorsque l'algorithme \textbf{AES-XTS} est indiqué
+\item le calcul correspond au mode \texttt{essiv:sha256} de \textit{LUKS}
+  autrement
+\end{itemize}
 \paragraph{}
 Il est donc nécessaire d'adapter la fonction afin qu'elle prenne en compte les
 propriétés indiquées dans les métadonnées \textit{LUKS} lorsqu'elles sont mises
-au format \textit{GEOM ELI}.
+au format \textit{GEOM ELI}. Il n'est cependant pas possible d'utiliser
+directement tous les algorithmes et modes possibles avec \textit{LUKS} sans
+modifier les structures \texttt{metadata} et \texttt{softc} hériftées de
+\textit{GELI}. Ces structures étant utilisées par de nombreuses fonctions, leur
+modification nécessiterait celle d'une très grande partie du code. Le nombre de
+choix possibles est donc limité aux associations suivantes:
+\begin{center}
+  \begin{tabular}{ | l | l | }
+    \hline
+    \textbf{Cipher name} & \textbf{Cipher mode}  \\
+    \hline
+    AES-XTS              & \texttt{plain64}      \\
+    AES-CBC              & \texttt{essiv:sha256} \\
+    CAST5-CBC            & \texttt{plain}        \\
+    \hline
+  \end{tabular}
+\end{center}
