@@ -157,6 +157,17 @@ pour les données du disque (donc précisé par les champs {\em cipher-name} et
 {\em cipher-mode}) avec comme clé le résultat de la dérivation de la phrase de
 passe.
 
+\paragraph{}
+Une différence avec {\em GELI} est que le nombre d'itérations utilisée pour 
+{\em PKCS5v2} est différent pour chaque keyslot alors que pour {\em GELI} c'est
+le même pour toutes les phrases de passe.
+Dans {\em GELI} la phrase de passe est dérivée en espace utilisateur avant 
+d'être envoyée en espace noyau, qui déchiffrera ensuite la clé de chiffrement.
+Or si l'on applique le même procédé pour {\em LUKS}, il faut alors dans le cas
+où les 8 keyslot sont actifs, envoyer 8 phrases de passe dérivées au noyau.
+Il est donc plus simple d'envoyer la phrase de passe directement au noyau, qui
+effectuera donc tout les calculs.
+
 \subsubsection{Sélection des algorithmes utilisés}
 \paragraph{}
 Deux données importantes sont nécessaires pour le chiffrement et déchiffrement
