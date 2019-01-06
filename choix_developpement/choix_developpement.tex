@@ -251,3 +251,87 @@ choix possibles est donc limité aux associations suivantes:
     \hline
   \end{tabular}
 \end{center}
+
+
+\subsubsection{Noyau et espace utilisateur}
+\paragraph{}
+Pour implémenter le support de {\em LUKS} sur {\em FreeBSD}, et donc de nouvelles
+fonction, ainsi que la modification de fonctions existantes de {\em GELI}, il
+faut savoir pour chaque fonction si elle est utilisée dans le noyau ou en espace
+utilisateur ou encore si elle est utilisée dans les deux cas. En effet, on peut
+par exemple citer l'utilisation de la fonction {\em malloc} qui diffère entre
+le noyau et l'espace utilisateur, on peut également noter que l'utilisation des
+fonctions de chiffrement se fait à travers l'API {\em opencrypto} dans le noyau
+et à travers la bibliothèque {\em OpenSSL} en espace utilisateur. 
+
+\paragraph{}
+Dans l'outil en espace utilisateur permettant d'intéragir avec le module 
+{\em geom\_eli} (dont le fichier source est /sbin/geom/class/eli/geom\_eli.c),
+on peut noter les deux inclusions :
+\begin{lstlisting}
+#include <geom/eli/g_eli.h>
+#include <geom/eli/pkcs5v2.h>
+\end{lstlisting}
+
+\paragraph{}
+Donc les fonctions utilisées directement par l'outil en espace utilisateur sont
+celles dont le prototype ou la définition se trouve dans {\em g\_eli.h} et
+{\em pkcs5v2.h}. On y trouve les structures correspondant aux métadonnées brutes
+comme traitées ({\em g\_eli\_metadata,g\_eli\_softc}) mais aussi les fonctions
+pour décoder et encoder les métadonnées et la fonction qui permet de passer de
+{\em g\_eli\_metadata} à {\em g\_eli\_softc}. Enfin on y trouve les fonctions 
+permettant de chiffrer et déchiffrer la clé maître, avec donc des fonctions
+permettant d'effectuer des opérations de chiffrement et déchiffrement.
+
+
+% TODO: Vérifier en faisant make et make install
+\paragraph{}
+Si l'on s'intéresse aux objets qui sont assemblés pour produire la bibliothèque
+geom\_luks.o qui est ensuite installée sur le système, on peut noter la présence
+des 3 fichiers suivants :
+\begin{itemize}
+	\item g\_eli\_crypto.c
+	\item g\_eli\_hmac.c
+	\item g\_eli\_key.c
+	\item pkcs5v2.c
+\end{itemize}
+
+\paragraph{}
+Le fichier {\em g\_eli\_crypto.c} contient les fonctions permettant de réaliser
+du chiffrement et déchiffrement qui sont donc implémentées deux fois (une fois
+pour le noyau, une autre pour l'espace utilisateur). Le fichier
+{\em g\_eli\_hmac.c} contient quand à lui une implémentation des fonctions
+permettant de calculer des HMAC avec l'algorithme SHA512. Une seule implémentation
+est présente, elle est compatible entre le noyau et l'espace utilisateur, du fait
+que les fonctions et types associés à SHA512 sont les mêmes entre le noyau et
+l'espace utilisateur.
+% TODO: man 3 SHA512 et man 9 SHA512 pour préciser les deux bibliothèques qui diffèrent
+Cependant l'API {\em opencrypto} implémente déjà l'algorithme de HMAC avec SHA512.
+La réimplémentation de l'algorithme permettant le calcul d'un HMAC peut très
+probablement s'expliquer du fait qu'elle permet d'avoir un code plus restreint,
+et donc plus facilement maintenable.
+
+Le fichier {\em g\_eli\_key.c} contient quant à lui les fonctions permettant de
+chiffrer, déchiffrer et vérifier la clé maître, en utilisant les fonctions de
+{\em g\_eli\_crypto.c}.
+
+Enfin le fichier {\em pkcs5v2.c} contient les fonctions permettant le calcul
+d'une clé dérivée à partir d'une phrase de passe à travers le standard
+{\em PKCS5v2}, en utilisant les fonctions de {\em g\_eli\_hmac.c}.
+
+% TODO: schéma expliquant l'utilisation/dépendance de pkcs5v2_genkey avec g_eli_hmac.c
+
+\paragraph{}
+Dans l'implémentation du module {\em geom\_luks} on doit pouvoir être capable
+d'utiliser l'algorithme {\em PKCS5v2} avec SHA512 comme dans {\em GELI} mais
+aussi avec {\em SHA1,SHA256,RIPEMD160}. Cela peut-être très simple en utilisant
+l'API {\em opencrypto} qui prévoit déjà leur utilisation, cependant conserver
+le modèle de {\em GELI} imposerait l'implémentation de l'algorithme HMAC utilisant
+les autres algorithmes de hashage, et dupliquerait donc du code. Il faudrait
+donc savoir si l'utilisation de {\em PKCS5v2} et du {\em HMAC} en espace
+utilisateur est indispensable.
+
+\paragraph{}
+Le fichier {\em geom\_eli.c} révèle que ces fonctions sont utilisée pour réaliser
+des opérations sur la phrase de passe, qui sont donc réalisée uniquement ou
+en partie en espace utilisateur.
