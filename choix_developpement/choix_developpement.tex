@@ -168,6 +168,23 @@ où les 8 keyslot sont actifs, envoyer 8 phrases de passe dérivées au noyau.
 Il est donc plus simple d'envoyer la phrase de passe directement au noyau, qui
 effectuera donc tout les calculs.
 
+\subsubsection{Choix concernant la clé de chiffrement}
+\paragraph{}
+On a choisi de transformer les métadonnées de {\em LUKS} en métadonnées 
+{\em GELI}, cependant on ne peut pas vraiment passer du format {\em LUKS} à 
+{\em GELI} pour la clé de chiffrement. En effet, si on voulait écrire la clé 
+de chiffrement dans les métadonnées {\em GELI}, il faudrait déchiffrer la clé 
+présente sous le format {\em LUKS} puis la rechiffrer sous le format {\em GELI}
+pour ensuite la déchiffrer. Ce serait réaliser des opérations en plus, qui ne 
+sont pas nécessaires et il faudrait en plus de cela choisir une phrase de passe
+pour le rechiffrement de la clé au format {\em GELI}. 
+
+\paragraph{}
+La clé de chiffrement étant déjà traitée de façon séparée dans le code de 
+{\em GELI}, on choisi de traiter la clé de façon séparée également et donc de 
+ne pas la transformer au format {\em GELI}
+
+
 \subsubsection{Sélection des algorithmes utilisés}
 \paragraph{}
 Deux données importantes sont nécessaires pour le chiffrement et déchiffrement
