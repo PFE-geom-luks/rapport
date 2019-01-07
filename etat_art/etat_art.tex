@@ -349,7 +349,7 @@ renforcement de phrases de passe, via la fonction {\em PBKDF2} décrite
 par le standard {\em PKCS\#5v2}. Les deux formats de métadonnées 
 permettent l'utilisation de plusieurs clés.
 
-\subsubsection{Intégration avec la séquence de démarrage}
+\subsection{Démarrage sur une partition chiffrée}
 \paragraph{}
 L'intégration avec le démarrage permet notamment d'avoir la racine du système 
 de fichier sur une partition chiffrée, et même éventuellement le {\em /boot}
@@ -357,30 +357,104 @@ dans lequel sont usuellement stockés les fichiers permettant de démarrer le
 système d'exploitation.
 
 \paragraph{}
-Dans le cas de {\em Linux}, le format {\em LUKS} a été intégré dans
-l'initramfs via un hook qui charge le module {\em dm-crypt} puis utilise 
-le binaire {\em cryptsetup} pour déchiffrer le disque. 
-Le format {\em LUKS} a également été intégré à {\em GRUB} sous la 
-forme du module {\em luks.mod}. Il permet au premier stage de {\em GRUB} de 
-déchiffrer la partition sur laquelle se trouve la configuration de {\em GRUB}.
-Ainsi sous {\em Linux}, il est possible de chiffrer toute la racine de son 
-système, {\em /boot} compris. Il est ensuite question de pouvoir taper une 
-seule fois la phrase de passe, 
-pouvoir faire de l'authentification unique (SSO), cela est 
-également possible, il suffit de mettre un fichier contenant la clé de 
-chiffrement en clair dans l'initramfs. Ainsi {\em GRUB} déchiffre le disque, 
-puis charge l'initramfs qui peut déchiffrer la partition sans avoir besoin 
-de demander une phrase de passe.
+Le démarrage sur une partition chiffrée signifie que la partition contenant la
+racine du système (contenant {\em/bin, /sbin, /etc, etc}) est chiffrée et que
+le démarrage sur ce système est possible.
 
 \paragraph{}
-Dans le cas de {\em GELI}, il est également possible de chiffrer la racine du 
-système, le bootloader de {\em FreeBSD} étant capable de lire les métadonnées 
-{\em GELI}, ainsi que de déchiffrer des données. 
-Il est également possible de chiffrer le 
-{\em /boot} car le 2ème stage du bootloader ({\em boot2}) contient le code 
-nécessaire pour déchiffrer un disque au format {\em GELI}, à condition que 
-la table de partition soit au format GPT. La phrase de passe est passée via 
-une zone mémoire au dernier stage qui pourra l'utiliser pour démarrer.
+On propose de rappeler la séquence de démarrage pour la suite.
+\\
+Le BIOS premier programme démarre et permet de lancer le bootloader, qui se
+charge de lancer le système, en lançant l'inital ramdisk, qui est un noyau
+allégé, permettant de préparer notamment le disque lorsqu'il utilise LVM, du 
+RAID, ou encore du chiffrement. Le noyau contient le minimum et les modules
+nécessaires sont chargés au démarrage. Cela permet de réduire la taille du noyau
+à charger en RAM, tout en supportant un grand nombre de matériel. L'initial
+ramdisk se charge donc de charger les modules qui correspondent au matériel de
+la machine, puis lance le premier processus appelé Init qui se charge de lancer
+les autres processus à lancer au démarrage.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.2\linewidth]{etat_art/Demarrage.png}
+\caption{\label{fig:demarrage}Démarrage sous Linux et FreeBSD}
+\end{figure}
+
+\paragraph{}
+Comme il existe plusieurs cas possible de partitionnement, on détaille dans la
+suite les principales solutions existantes.
+\\
+Sous Linux comme sous FreeBSD, la partition contenant la racine du système ne
+contient pas nécessairement le dossier {\em /boot} qui peut être stocké sur une
+partition différente. Il y a alors deux cas, soit la partition {\em /boot} est
+chiffrée, soit elle ne l'est pas. Le premier cas est alors identique à une seule
+partition chiffrée contenant également le {\em /boot} (en ignorant les
+différences concernant le système de fichier ainsi que la possiblité de séparer
+d'autres dossier sur des partitions différentes). Dans le cas d'un {\em /boot}
+chiffré, il est plus courant de trouver une configuration avec une seule
+partition regroupant le {\em /} et le {\em /boot}.
+
+\subsubsection{Démarrage sur une partition chiffrée sous Linux avec LUKS}
+
+\paragraph{}
+Sous Linux, dans le cas d'un {\em /boot} séparé, le système démarre normalement,
+puis lorsque le l'Initrd est chargé, il charge les modules et lance les scripts
+(nommé hook) nécessaires pour démarrer, dont ceux permettant de monter la
+racine. Un script est dédié au déchiffrement des disques, son nom et son chemin
+dans le système de fichier varie selon les distributions. Le script est donc
+lancé et permet de déchiffrer la partition chiffrée et donc le démarrage
+peut continuer normalement.
+
+\paragraph{}
+Dans le cas où le {\em /boot} est chiffré, c'est le rôle des premieres parties
+du bootloader de déchiffrer le disque pour pouvoir charger l'Initrd. Parmi les
+bootloader supportés par Linux on peut citer GRUB2 et LILO
+(qui n'est plus maintenu) qui supportent le déchiffrement de partition chiffrée
+avec LUKS.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.9\linewidth]{etat_art/DemarrageLinux.png}
+\caption{\label{fig:demarrageLinux}Démarrage sur une partition chiffrée avec LUKS}
+\end{figure}
+
+\paragraph{}
+
+Il faut bien noter la différence entre les deux cas, dans le premier un script
+s'occupe de déchiffrer le disque en utilisant le module noyau dm-crypt qui sera
+chargé, et donc le script sera en mesure de déchiffrer n'importe quel type de
+volume chiffré compatible avec dm-crypt. Tandis que dans le second cas, le
+déchiffrement du disque n'est possible que pour des disque chiffré avec LUKS.
+Pour l'instant seul le format 1.0 de LUKS est d'ailleurs supporté par GRUB2.
+
+\subsubsection{Démarrage sur une partition chiffrée sous FreeBSD avec GELI}
+
+\paragraph{}
+Dans le cas de FreeBSD avec un {\em /boot} séparé, c'est tout simplement au
+noyau de déchiffrer le disque pour le monter. Cela est réalisé en chargant
+le module {\em geom\_eli}, qui va alors chercher toutes les partitions qui sont
+de type {\em GELI} et va alors proposer de les déchiffrer. Cette étape est
+équivalente à celle de l'Initrd de Linux.
+
+\paragraph{}
+Dans le cas d'une seule partition contenant le {\em /} et le {\em /boot}, comme
+la chaîne de démarrage comprend plusieurs étapes, c'est d'abord à {\em boot2}
+(la dernière étape du bootloader) de déchiffrer le disque pour charger le loader
+de FreeBSD, qui va alors avoir besoin de déchiffrer le disque pour pouvoir
+utiliser les noyaux disponibles notamment. Enfin dans le noyau, le module
+{\em geom\_eli} va permettre de déchiffrer la partition contenant la racine.
+Pour éviter d'avoir à taper la phrase de passe plusieurs fois, la phrase de
+passe est passée via des zones mémoires partagées aux différents parties :
+{\em boot2} donne la phrase de passe au {\em loader} qui la donne au noyau.
+
+
+\paragraph{}
+\begin{figure}[h]
+\centering
+\includegraphics[width=.9\linewidth]{etat_art/DemarrageFreeBSD.png}
+\caption{\label{fig:demarrageFreeBSD}Démarrage sur une partition chiffrée avec GELI}
+\end{figure}
 
 \paragraph{}
 On constate donc que {\em LUKS} standardise le format sur disque et restreint
@@ -390,4 +464,4 @@ sur le format des métadonnées sur le disque, les algorithmes disponibles.
 contrairement à {\em GELI}.
 
 On peut donc partir du code source de GELI et essayer d'adapter pour pouvoir
-utiliser le format {\em LUKS}
+utiliser le format {\em LUKS}.
