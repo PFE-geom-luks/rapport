@@ -284,7 +284,6 @@ permettant de chiffrer et déchiffrer la clé maître, avec donc des fonctions
 permettant d'effectuer des opérations de chiffrement et déchiffrement.
 
 
-% TODO: Vérifier en faisant make et make install
 \paragraph{}
 Si l'on s'intéresse aux objets qui sont assemblés pour produire la bibliothèque
 geom\_luks.o qui est ensuite installée sur le système, on peut noter la présence
@@ -305,7 +304,6 @@ permettant de calculer des HMAC avec l'algorithme SHA512. Une seule implémentat
 est présente, elle est compatible entre le noyau et l'espace utilisateur, du fait
 que les fonctions et types associés à SHA512 sont les mêmes entre le noyau et
 l'espace utilisateur.
-% TODO: man 3 SHA512 et man 9 SHA512 pour préciser les deux bibliothèques qui diffèrent
 Cependant l'API {\em opencrypto} implémente déjà l'algorithme de HMAC avec SHA512.
 La réimplémentation de l'algorithme permettant le calcul d'un HMAC peut très
 probablement s'expliquer du fait qu'elle permet d'avoir un code plus restreint,
@@ -319,8 +317,6 @@ Enfin le fichier {\em pkcs5v2.c} contient les fonctions permettant le calcul
 d'une clé dérivée à partir d'une phrase de passe à travers le standard
 {\em PKCS5v2}, en utilisant les fonctions de {\em g\_eli\_hmac.c}.
 
-% TODO: schéma expliquant l'utilisation/dépendance de pkcs5v2_genkey avec g_eli_hmac.c
-
 \paragraph{}
 Dans l'implémentation du module {\em geom\_luks} on doit pouvoir être capable
 d'utiliser l'algorithme {\em PKCS5v2} avec SHA512 comme dans {\em GELI} mais
@@ -328,10 +324,14 @@ aussi avec {\em SHA1,SHA256,RIPEMD160}. Cela peut-être très simple en utilisan
 l'API {\em opencrypto} qui prévoit déjà leur utilisation, cependant conserver
 le modèle de {\em GELI} imposerait l'implémentation de l'algorithme HMAC utilisant
 les autres algorithmes de hashage, et dupliquerait donc du code. Il faudrait
-donc savoir si l'utilisation de {\em PKCS5v2} et du {\em HMAC} en espace
-utilisateur est indispensable.
+donc factoriser ou savoir si l'utilisation de {\em PKCS5v2} et du {\em HMAC}
+en espace utilisateur est indispensable. De plus les noms de fonctions qui
+correspondent à l'algorithme SHA1 diffèrent entre le noyau et l'espace
+utilisateur, il faudrait donc dupliquer le code ou factoriser en modifiant
+légèrement les sources de SHA1 dans le noyau (ajouter des noms possibles pour
+les différentes fonctions).
 
 \paragraph{}
-Le fichier {\em geom\_eli.c} révèle que ces fonctions sont utilisée pour réaliser
-des opérations sur la phrase de passe, qui sont donc réalisée uniquement ou
+Le fichier {\em geom\_eli.c} révèle que ces fonctions sont utilisées pour réaliser
+des opérations sur la phrase de passe, qui sont donc réalisées uniquement ou
 en partie en espace utilisateur.
