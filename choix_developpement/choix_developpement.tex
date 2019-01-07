@@ -337,8 +337,7 @@ des opérations sur la phrase de passe, qui sont donc réalisées uniquement ou
 en partie en espace utilisateur.
 
 
-\subsection{Attribution des paramètres aux métadonnées GELI}
-
+\subsubsection{Champ drapeaux: \texttt{md\_flags}}
 \paragraph{}
 Certains paramètres, indispensables à \textit{GELI} pour manipuler des disques
 chiffrés, n'ont pas d'équivalents dans les métadonnées \textit{LUKS} et ne
@@ -346,8 +345,6 @@ peuvent donc pas être traduits d'un standard à l'autre. Il peuvent correspondr
 par exemple à l'authentification des données, prise en charge par \textit{GELI}
 mais pas \textit{LUKS}. D'autres champs décrivant comment sont chiffrées les
 données, en dehors des algorithmes utilisés.
-
-\subsubsection{Champ drapeaux: \texttt{md\_flags}}
 \paragraph{}
 Ce champ est présent dans les structures \texttt{metadata} et \texttt{softc} de
 \textit{GELI}. Il précise les différentes options possibles pour le chiffrement
