@@ -54,7 +54,7 @@ la taille des secteurs. Enfin les clés de chiffrement qui sont dérivées à pa
 de la clé maître y sont également stockées sous la forme d'un arbre et d'une 
 queue.
 
-\subsection{Transformer les métadonnées de LUKS en métadonnées GELI}
+\subsection{Transformation des métadonnées de LUKS en métadonnées GELI}
 \subsubsection{Principe général}
 \paragraph{}
 Écrire un module noyau de toute pièce capable d'utiliser un disque chiffré avec
@@ -335,3 +335,81 @@ les différentes fonctions).
 Le fichier {\em geom\_eli.c} révèle que ces fonctions sont utilisées pour réaliser
 des opérations sur la phrase de passe, qui sont donc réalisées uniquement ou
 en partie en espace utilisateur.
+
+
+\subsection{Attribution des paramètres aux métadonnées GELI}
+
+\paragraph{}
+Certains paramètres, indispensables à \textit{GELI} pour manipuler des disques
+chiffrés, n'ont pas d'équivalents dans les métadonnées \textit{LUKS} et ne
+peuvent donc pas être traduits d'un standard à l'autre. Il peuvent correspondre
+par exemple à l'authentification des données, prise en charge par \textit{GELI}
+mais pas \textit{LUKS}. D'autres champs décrivant comment sont chiffrées les
+données, en dehors des algorithmes utilisés.
+
+\subsubsection{Champ drapeaux: \texttt{md\_flags}}
+\paragraph{}
+Ce champ est présent dans les structures \texttt{metadata} et \texttt{softc} de
+\textit{GELI}. Il précise les différentes options possibles pour le chiffrement
+de disques et garanti ainsi la compitibilité entre les différentes versions de
+\textit{GELI}. La version actuelle comprend 16 drapeaux: \\
+\\
+\begin{tabularx}{\linewidth}{ | l | X | }
+  \hline
+  \textbf{Drapeau}                            & \textbf{Description} \\
+  \hline
+  \texttt{G\_LUKS\_FLAG\_ONETIME}             & Utiliser des clés aléatoires et
+  uniques \\
+  \texttt{G\_LUKS\_FLAG\_BOOT}                & Demander la phrase de
+  chiffrement au noyau, avant de monter \texttt{root} \\
+  \texttt{G\_LUKS\_FLAG\_WO\_DETACH}          & Détacher le volume à la dernière
+  fermeture, si nous étions ouverts à l'écriture \\
+  \texttt{G\_LUKS\_FLAG\_RW\_DETACH}          & Détacher le volume à la dernière
+  fermeture \\
+  \texttt{G\_LUKS\_FLAG\_AUTH}                & Proposer l'authentification des
+  données \\
+  \texttt{G\_LUKS\_FLAG\_RO}                  & Le volume est en lecture seule,
+  toute tentative d'écriture serait refusée \\
+  \texttt{G\_LUKS\_FLAG\_NODELETE}            & Ne pas ignorer les requêtes
+  \texttt{BIO\_DELETE} \\
+  \texttt{G\_LUKS\_FLAG\_GLUKSBOOT}           & Cette version de \textit{GELI}
+  supporte \textit{GELIBoot} \\
+  \texttt{G\_LUKS\_FLAG\_GLUKSDISPLAYPASS}    & Masquer la longueur de la phrase
+  de chiffrement dans \textit{GELIboot} \\
+  \texttt{G\_LUKS\_FLAG\_WOPEN}               & Le volume autorise l'écriture \\
+  \texttt{G\_LUKS\_FLAG\_DESTROY}             & Détruire le volume \\
+  \texttt{G\_LUKS\_FLAG\_NATIVE\_BYTE\_ORDER} & Le volume utilise l'ordre natif
+  d'octets pour la générer du vecteur d'initialisation \\
+  \texttt{G\_LUKS\_FLAG\_SINGLE\_KEY}         & Le volume utilise une seule clé
+  de chiffrement \\
+  \texttt{G\_LUKS\_FLAG\_SUSPEND}             & Dispositif suspendu \\
+  \texttt{G\_LUKS\_FLAG\_FIRST\_KEY}          & Le volume utilise la première
+  clé de chiffrement \\
+  \texttt{G\_LUKS\_FLAG\_ENC\_IVKEY}          & Le volume utilise l'IV-Key pour
+  générer de la clé de chiffrement \\
+  \hline
+\end{tabularx}
+\paragraph{\texttt{G\_LUKS\_FLAG\_BOOT}}
+Ce drapeau permet au système de démarrer même si la partition \texttt{root} est
+chiffrée. Il serait donc possible de l'utiliser pour la chiffrer avec
+\textit{LUKS} (si les fonctions permettant le déchiffrement d'un volume
+\textit{LUKS} existent), et doit donc être activé dans ce cas précis.
+\paragraph{\texttt{G\_LUKS\_FLAG\_AUTH}}
+\textit{LUKS} ne supportant pas l'authentification des données, ce drapeau est
+désactivé pour ignorer les fonctions et les champs normalement utilisés par
+\textit{GELI} pour réaliser cette action. Ce drapeau doit être désactivé.
+\paragraph{\texttt{G\_LUKS\_FLAG\_SINGLE\_KEY}}
+Dans la plupart des versions de \textit{GELI}, la clé maître est dérivée pour
+chiffrer chaque secteur. Cependant, \textit{LUKS} ne la dérive pas et utilise la
+même clé pour chiffrer toute le volume. Ce drapeau doit alors être activé, car
+il permet d'indiquer aux fonctions de \textit{GELI} de ne pas dériver la clé
+pour chaque secteur, et ainsi fonctionner comme \textit{LUKS} dans ce cas
+précis.
+
+\subsubsection{Nombre de clés actives: \texttt{md\_keys}}
+Dans les métadonnées \textit{GELI}, une variable correspond au nombre de clés
+permettant le déchiffrement de la clé maître, et donc du volume chiffré. Dans
+\textit{LUKS}, on peut savoir si l'emplacement d'une clé est actif ou non; il y
+a en tout 8 emplacements. Une boucle permet alors de parcourir tous les
+emplacement et savoir s'ils sont actifs ou non, et ainsi de connaître le nombre
+de phrases secrètes à indiquer dans les métadonnées.
