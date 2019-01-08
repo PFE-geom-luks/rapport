@@ -6,6 +6,7 @@ rapport.fdb_latexmk
 rapport.fls
 rapport.log
 rapport.pdf
+rapport.out
 rapport.toc
 
 # emacs auto
