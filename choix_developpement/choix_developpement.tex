@@ -158,7 +158,7 @@ pour les données du disque (donc précisé par les champs {\em cipher-name} et
 passe.
 
 \paragraph{}
-Une différence avec {\em GELI} est que le nombre d'itérations utilisée pour 
+Une différence avec {\em GELI} est que le nombre d'itérations utilisé pour 
 {\em PKCS5v2} est différent pour chaque keyslot alors que pour {\em GELI} c'est
 le même pour toutes les phrases de passe.
 Dans {\em GELI} la phrase de passe est dérivée en espace utilisateur avant 
@@ -355,47 +355,47 @@ de disques et garanti ainsi la compitibilité entre les différentes versions de
   \hline
   \textbf{Drapeau}                            & \textbf{Description} \\
   \hline
-  \texttt{G\_LUKS\_FLAG\_ONETIME}             & Utiliser des clés aléatoires et
+  \texttt{G\_ELI\_FLAG\_ONETIME}             & Utiliser des clés aléatoires et
   uniques \\
-  \texttt{G\_LUKS\_FLAG\_BOOT}                & Demander la phrase de
+  \texttt{G\_ELI\_FLAG\_BOOT}                & Demander la phrase de
   chiffrement au noyau, avant de monter \texttt{root} \\
-  \texttt{G\_LUKS\_FLAG\_WO\_DETACH}          & Détacher le volume à la dernière
+  \texttt{G\_ELI\_FLAG\_WO\_DETACH}          & Détacher le volume à la dernière
   fermeture, si nous étions ouverts à l'écriture \\
-  \texttt{G\_LUKS\_FLAG\_RW\_DETACH}          & Détacher le volume à la dernière
+  \texttt{G\_ELI\_FLAG\_RW\_DETACH}          & Détacher le volume à la dernière
   fermeture \\
-  \texttt{G\_LUKS\_FLAG\_AUTH}                & Proposer l'authentification des
+  \texttt{G\_ELI\_FLAG\_AUTH}                & Proposer l'authentification des
   données \\
-  \texttt{G\_LUKS\_FLAG\_RO}                  & Le volume est en lecture seule,
+  \texttt{G\_ELI\_FLAG\_RO}                  & Le volume est en lecture seule,
   toute tentative d'écriture serait refusée \\
-  \texttt{G\_LUKS\_FLAG\_NODELETE}            & Ne pas ignorer les requêtes
+  \texttt{G\_ELI\_FLAG\_NODELETE}            & Ne pas ignorer les requêtes
   \texttt{BIO\_DELETE} \\
-  \texttt{G\_LUKS\_FLAG\_GLUKSBOOT}           & Cette version de \textit{GELI}
+  \texttt{G\_ELI\_FLAG\_GELIBOOT}           & Cette version de \textit{GELI}
   supporte \textit{GELIBoot} \\
-  \texttt{G\_LUKS\_FLAG\_GLUKSDISPLAYPASS}    & Masquer la longueur de la phrase
+  \texttt{G\_ELI\_FLAG\_GLUKSDISPLAYPASS}    & Masquer la longueur de la phrase
   de chiffrement dans \textit{GELIboot} \\
-  \texttt{G\_LUKS\_FLAG\_WOPEN}               & Le volume autorise l'écriture \\
-  \texttt{G\_LUKS\_FLAG\_DESTROY}             & Détruire le volume \\
-  \texttt{G\_LUKS\_FLAG\_NATIVE\_BYTE\_ORDER} & Le volume utilise l'ordre natif
+  \texttt{G\_ELI\_FLAG\_WOPEN}               & Le volume autorise l'écriture \\
+  \texttt{G\_ELI\_FLAG\_DESTROY}             & Détruire le volume \\
+  \texttt{G\_ELI\_FLAG\_NATIVE\_BYTE\_ORDER} & Le volume utilise l'ordre natif
   d'octets pour la générer du vecteur d'initialisation \\
-  \texttt{G\_LUKS\_FLAG\_SINGLE\_KEY}         & Le volume utilise une seule clé
+  \texttt{G\_ELI\_FLAG\_SINGLE\_KEY}         & Le volume utilise une seule clé
   de chiffrement \\
-  \texttt{G\_LUKS\_FLAG\_SUSPEND}             & Dispositif suspendu \\
-  \texttt{G\_LUKS\_FLAG\_FIRST\_KEY}          & Le volume utilise la première
+  \texttt{G\_ELI\_FLAG\_SUSPEND}             & Dispositif suspendu \\
+  \texttt{G\_ELI\_FLAG\_FIRST\_KEY}          & Le volume utilise la première
   clé de chiffrement \\
-  \texttt{G\_LUKS\_FLAG\_ENC\_IVKEY}          & Le volume utilise l'IV-Key pour
+  \texttt{G\_ELI\_FLAG\_ENC\_IVKEY}          & Le volume utilise l'IV-Key pour
   générer de la clé de chiffrement \\
   \hline
 \end{tabularx}
-\paragraph{\texttt{G\_LUKS\_FLAG\_BOOT}}
+\paragraph{\texttt{G\_ELI\_FLAG\_BOOT}}
 Ce drapeau permet au système de démarrer même si la partition \texttt{root} est
 chiffrée. Il serait donc possible de l'utiliser pour la chiffrer avec
 \textit{LUKS} (si les fonctions permettant le déchiffrement d'un volume
 \textit{LUKS} existent), et doit donc être activé dans ce cas précis.
-\paragraph{\texttt{G\_LUKS\_FLAG\_AUTH}}
+\paragraph{\texttt{G\_ELI\_FLAG\_AUTH}}
 \textit{LUKS} ne supportant pas l'authentification des données, ce drapeau est
 désactivé pour ignorer les fonctions et les champs normalement utilisés par
 \textit{GELI} pour réaliser cette action. Ce drapeau doit être désactivé.
-\paragraph{\texttt{G\_LUKS\_FLAG\_SINGLE\_KEY}}
+\paragraph{\texttt{G\_ELI\_FLAG\_SINGLE\_KEY}}
 Dans la plupart des versions de \textit{GELI}, la clé maître est dérivée pour
 chiffrer chaque secteur. Cependant, \textit{LUKS} ne la dérive pas et utilise la
 même clé pour chiffrer toute le volume. Ce drapeau doit alors être activé, car
@@ -410,3 +410,6 @@ permettant le déchiffrement de la clé maître, et donc du volume chiffré. Dan
 a en tout 8 emplacements. Une boucle permet alors de parcourir tous les
 emplacement et savoir s'ils sont actifs ou non, et ainsi de connaître le nombre
 de phrases secrètes à indiquer dans les métadonnées.
+% LocalWords:  LUKS GELI GEOM keys md KEY FLAG AUTH root BOOT l'IV-Key IVKEY
+% LocalWords:  ENC FIRST ORDER BYTE DESTROY WOPEN GELIboot GLUKSDISPLAYPASS
+% LocalWords:  GELIBoot GLUKSBOOT
