@@ -133,6 +133,7 @@ l'algorithme PKCS5v2 en prenant SHA512 comme fonction pseudo aléatoire.
 
 
 \subsubsection{Déchiffrement de la clé de chiffrement dans le cas de LUKS}
+\label{sub:dechif_cle}
 \paragraph{}
 On a donc besoin de déchiffrer la clé de chiffrement stockée dans l'en-tête LUKS.
 Pour cela il faut tout d'abord bien comprendre comment est stockée la clé de 
@@ -336,6 +337,15 @@ Le fichier {\em geom\_eli.c} révèle que ces fonctions sont utilisées pour ré
 des opérations sur la phrase de passe, qui sont donc réalisées uniquement ou
 en partie en espace utilisateur.
 
+\paragraph{}
+Pour simplifier l'implémentation, on choisi d'implémenter toutes les opérations
+dans le noyau pour les raisons évoquées ci-dessus, et pour permettre un 
+déchiffrement plus simple de la clé maître comme évoqué en \ref{sub:dechif_cle}.
+\paragraph{}
+On implémente donc les différentes fonctions pour déchiffrer la clé maître à
+partir de la phrase de passe. Ce qui nous permet donc d'arriver à la création
+du disque déchiffré, après avoir traduit correctement les métadonnées de
+{\em GELI} en métadonnées {\em LUKS}.
 
 \subsubsection{Champ drapeaux: \texttt{md\_flags}}
 \paragraph{}
