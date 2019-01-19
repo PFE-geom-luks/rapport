@@ -427,4 +427,15 @@ de phrases secrètes à indiquer dans les métadonnées.
 \subsubsection{Création du disque déchiffré}
 Avec {\em GEOM} l'API noyau de FreeBSD pour gérer les disques, lorsque l'on
 créé un disque à partir d'un autre, la structure comprends notamment, la taille
-du disque, la taille d'un secteur
+du disque, la taille d'un secteur. Pour calculer la taille du disque, il faut
+soustraire de la taille du de la partition complète, la taille de l'en-tête. 
+Avec les métadonnées de {\em LUKS} on a directement le champs {\em payloadoffset}
+qui permet de connaître le nombre de secteurs qu'occupent l'en-tête. Comme sous
+{\em GELI} les métadonnées sont à la fin du disque, il n'y a pas de
+transformation à faire sur le numéro de secteur lors de lectures ou écritures.
+Cependant avec {\em LUKS}, comme les métadonnées sont au début, il faut prévoir
+ce décalage. {\em GELI} ne prévoyant pas de réaliser cette opération, on rajoute
+à la structure {\em softc} un champ {\em sc\_offset} que l'on utilise dans les
+fonctions de lecture et écriture sur disque.
+
+
