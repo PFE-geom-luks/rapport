@@ -127,7 +127,7 @@ clé du disque.
 \subsubsection{Déchiffrement de la clé de chiffrement dans le cas de GELI}
 Dans le cas de GELI, le code prévoit le déchiffrement de la clé de chiffrement 
 dans le noyau, de façon à pouvoir déchiffrer le disque au démarrage (pour 
-pouvoir avec un volume racine chiffré). Plus précisément l'utilitaire en espace
+pouvoir déchiffrer un volume racine chiffré). Plus précisément l'utilitaire en espace
 utilisateur envoie au noyau via l'API de GEOM, la phrase de passe dérivée via
 l'algorithme PKCS5v2 en prenant SHA512 comme fonction pseudo aléatoire.
 
@@ -140,7 +140,7 @@ Pour cela il faut tout d'abord bien comprendre comment est stockée la clé de
 chiffrement sur le disque.
 
 \paragraph{}
-La clé de chiffrement est hashée selon l'algorithme spécifiée par le champ
+La clé de chiffrement est hashée selon l'algorithme spécifié par le champ
 {\em hash-spec}, et stockée dans le champ {\em mkdigest} (Master Key Digest).
 
 L'en-tête LUKS permet de stocker la même clé chiffrée avec huits phrases de passe
@@ -150,7 +150,7 @@ Pour un keyslot, la phrase de passe est dérivée selon l'aglorithme {\em PKCS5v
 avec comme fonction pseudo aléatoire l'algorithme de hashage spécifié par 
 {\em hash-spec}. La clé est ensuite fragmentée via l'algorithme 
 {\em anti-forensic splitter} spécifié dans \cite{AFsplitting} qui a pour but de
-lutter contre la persistance des informations stockées sur des disques dur
+lutter contre la persistance des informations stockées sur des disques durs
 (disques qui utilisent le magnétisme pour stocker les données)
 \\
 Enfin le résultat de la fragmentation est chiffré selon l'algorithme utilisé 
@@ -182,7 +182,7 @@ pour le rechiffrement de la clé au format {\em GELI}.
 
 \paragraph{}
 La clé de chiffrement étant déjà traitée de façon séparée dans le code de 
-{\em GELI}, on choisi de traiter la clé de façon séparée également et donc de 
+{\em GELI}, on choisit de traiter la clé de façon séparée également et donc de 
 ne pas la transformer au format {\em GELI}
 
 
@@ -237,7 +237,7 @@ Il est donc nécessaire d'adapter la fonction afin qu'elle prenne en compte les
 propriétés indiquées dans les métadonnées \textit{LUKS} lorsqu'elles sont mises
 au format \textit{GEOM ELI}. Il n'est cependant pas possible d'utiliser
 directement tous les algorithmes et modes possibles avec \textit{LUKS} sans
-modifier les structures \texttt{metadata} et \texttt{softc} hériftées de
+modifier les structures \texttt{metadata} et \texttt{softc} héritées de
 \textit{GELI}. Ces structures étant utilisées par de nombreuses fonctions, leur
 modification nécessiterait celle d'une très grande partie du code. Le nombre de
 choix possibles est donc limité aux associations suivantes:
@@ -257,7 +257,7 @@ choix possibles est donc limité aux associations suivantes:
 \subsubsection{Noyau et espace utilisateur}
 \paragraph{}
 Pour implémenter le support de {\em LUKS} sur {\em FreeBSD}, et donc de nouvelles
-fonction, ainsi que la modification de fonctions existantes de {\em GELI}, il
+fonctions, ainsi que la modification de fonctions existantes de {\em GELI}, il
 faut savoir pour chaque fonction si elle est utilisée dans le noyau ou en espace
 utilisateur ou encore si elle est utilisée dans les deux cas. En effet, on peut
 par exemple citer l'utilisation de la fonction {\em malloc} qui diffère entre
@@ -288,7 +288,7 @@ permettant d'effectuer des opérations de chiffrement et déchiffrement.
 \paragraph{}
 Si l'on s'intéresse aux objets qui sont assemblés pour produire la bibliothèque
 geom\_luks.o qui est ensuite installée sur le système, on peut noter la présence
-des 3 fichiers suivants :
+des 4 fichiers suivants :
 \begin{itemize}
 	\item g\_eli\_crypto.c
 	\item g\_eli\_hmac.c
@@ -358,7 +358,7 @@ données, en dehors des algorithmes utilisés.
 \paragraph{}
 Ce champ est présent dans les structures \texttt{metadata} et \texttt{softc} de
 \textit{GELI}. Il précise les différentes options possibles pour le chiffrement
-de disques et garanti ainsi la compitibilité entre les différentes versions de
+de disques et garanti ainsi la compatibilité entre les différentes versions de
 \textit{GELI}. La version actuelle comprend 16 drapeaux: \\
 \\
 \begin{tabularx}{\linewidth}{ | l | X | }
@@ -381,7 +381,7 @@ de disques et garanti ainsi la compitibilité entre les différentes versions de
   \texttt{BIO\_DELETE} \\
   \texttt{G\_ELI\_FLAG\_GELIBOOT}           & Cette version de \textit{GELI}
   supporte \textit{GELIBoot} \\
-  \texttt{G\_ELI\_FLAG\_GLUKSDISPLAYPASS}    & Masquer la longueur de la phrase
+  \texttt{G\_ELI\_FLAG\_GELIDISPLAYPASS}    & Masquer la longueur de la phrase
   de chiffrement dans \textit{GELIboot} \\
   \texttt{G\_ELI\_FLAG\_WOPEN}               & Le volume autorise l'écriture \\
   \texttt{G\_ELI\_FLAG\_DESTROY}             & Détruire le volume \\
@@ -393,7 +393,7 @@ de disques et garanti ainsi la compitibilité entre les différentes versions de
   \texttt{G\_ELI\_FLAG\_FIRST\_KEY}          & Le volume utilise la première
   clé de chiffrement \\
   \texttt{G\_ELI\_FLAG\_ENC\_IVKEY}          & Le volume utilise l'IV-Key pour
-  générer de la clé de chiffrement \\
+  générer la clé de chiffrement \\
   \hline
 \end{tabularx}
 \paragraph{\texttt{G\_ELI\_FLAG\_BOOT}}
@@ -408,7 +408,7 @@ désactivé pour ignorer les fonctions et les champs normalement utilisés par
 \paragraph{\texttt{G\_ELI\_FLAG\_SINGLE\_KEY}}
 Dans la plupart des versions de \textit{GELI}, la clé maître est dérivée pour
 chiffrer chaque secteur. Cependant, \textit{LUKS} ne la dérive pas et utilise la
-même clé pour chiffrer toute le volume. Ce drapeau doit alors être activé, car
+même clé pour chiffrer tout le volume. Ce drapeau doit alors être activé, car
 il permet d'indiquer aux fonctions de \textit{GELI} de ne pas dériver la clé
 pour chaque secteur, et ainsi fonctionner comme \textit{LUKS} dans ce cas
 précis.
@@ -418,8 +418,13 @@ Dans les métadonnées \textit{GELI}, une variable correspond au nombre de clés
 permettant le déchiffrement de la clé maître, et donc du volume chiffré. Dans
 \textit{LUKS}, on peut savoir si l'emplacement d'une clé est actif ou non; il y
 a en tout 8 emplacements. Une boucle permet alors de parcourir tous les
-emplacement et savoir s'ils sont actifs ou non, et ainsi de connaître le nombre
+emplacements et savoir s'ils sont actifs ou non, et ainsi de connaître le nombre
 de phrases secrètes à indiquer dans les métadonnées.
 % LocalWords:  LUKS GELI GEOM keys md KEY FLAG AUTH root BOOT l'IV-Key IVKEY
 % LocalWords:  ENC FIRST ORDER BYTE DESTROY WOPEN GELIboot GLUKSDISPLAYPASS
 % LocalWords:  GELIBoot GLUKSBOOT
+
+\subsubsection{Création du disque déchiffré}
+Avec {\em GEOM} l'API noyau de FreeBSD pour gérer les disques, lorsque l'on
+créé un disque à partir d'un autre, la structure comprends notamment, la taille
+du disque, la taille d'un secteur

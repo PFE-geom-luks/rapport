@@ -347,7 +347,7 @@ contrairement à {\em GELI}, qui ne le supporte pas car {\em FreeBSD} ne
 supporte pas l'hibernation sur disque. Les deux systèmes permettent le 
 renforcement de phrases de passe, via la fonction {\em PBKDF2} décrite 
 par le standard {\em PKCS\#5v2}. Les deux formats de métadonnées 
-permettent l'utilisation de plusieurs clés.
+permettent l'utilisation de plusieurs phrase de passe pour chiffrer la clé.
 
 \subsection{Démarrage sur une partition chiffrée}
 \paragraph{}
@@ -358,14 +358,14 @@ système d'exploitation.
 
 \paragraph{}
 Le démarrage sur une partition chiffrée signifie que la partition contenant la
-racine du système (contenant {\em/bin, /sbin, /etc, etc}) est chiffrée et que
+racine du système (contenant {\em/bin, /sbin, /etc, etc.}) est chiffrée et que
 le démarrage sur ce système est possible.
 
 \paragraph{}
 On propose de rappeler la séquence de démarrage pour la suite.
 \\
-Le BIOS premier programme démarre et permet de lancer le bootloader, qui se
-charge de lancer le système, en lançant l'inital ramdisk, qui est un noyau
+Le BIOS est le premier programme qui démarre et permet de lancer le bootloader, 
+qui se charge de lancer le système, en lançant l'inital ramdisk, qui est un noyau
 allégé, permettant de préparer notamment le disque lorsqu'il utilise LVM, du 
 RAID, ou encore du chiffrement. Le noyau contient le minimum et les modules
 nécessaires sont chargés au démarrage. Cela permet de réduire la taille du noyau
@@ -392,8 +392,8 @@ chiffrée, soit elle ne l'est pas. Le premier cas est alors identique à une seu
 partition chiffrée contenant également le {\em /boot} (en ignorant les
 différences concernant le système de fichier ainsi que la possiblité de séparer
 d'autres dossier sur des partitions différentes). Dans le cas d'un {\em /boot}
-chiffré, il est plus courant de trouver une configuration avec une seule
-partition regroupant le {\em /} et le {\em /boot}.
+en clair, il est plus courant de trouver une configuration avec deux partitions,
+une contenant le {\em /} et une autre le {\em /boot}.
 
 \subsubsection{Démarrage sur une partition chiffrée sous Linux avec LUKS}
 
