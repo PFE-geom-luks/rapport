@@ -9,8 +9,10 @@ avec le format LUKS1.0. La version 2.0 de LUKS est encore en développement,
 pour arriver à sa version finale, bien que déjà disponible sous Linux. Pour
 pouvoir utiliser la partition au format LUKS sous FreeBSD il faut un système de
 fichier qui soit supporté par les deux systèmes d'exploitation. En listant
-les systèmes de fichiers disponibles, on peut noter que {\em XFS, EXT2, openZFS,
-FAT, FAT32, et NTFS} sont disponibles sous Linux et FreeBSD.
+les systèmes de fichiers disponibles, on peut noter que {\em EXT2, EXT3, openZFS,
+FAT, FAT32, et NTFS} sont disponibles sous Linux et FreeBSD. Le support de {\em
+XFS} a été retiré avec FreeBSD 10 et celui de {\em EXT4} n'existe actuellement
+qu'en lecture seule.
 
 \subsection{Le démarrage}
 Nous n'avons pas implémenté la partie s'occupant du démarrage sur une partition
