@@ -194,10 +194,15 @@ génération du vecteur d'initialisation \textbf{IV}. Dans notre cas, l'algorith
 de chiffrement peut être \textbf{aes-xts}, \textbf{aes-cbc} ou
 \textbf{cast5-cbc}. Chacun de ces algorithmes n'accepte pas les même méthodes de
 génération de l'\textbf{IV}, qui peut être de type \textit{plain} (32 ou 64) ou
-\textit{essiv:sha256}. Le vecteur d'unitialisation est unique à chaque secteur
-du volume chiffré. Le premier type prend numéro du secteur concerné codé sur 32
-ou 64 bits comme vecteur d'initialisation, tandis que \textit{essiv:sha256}
-(pour \textbf{e}ncrypted \textbf{s}ector-\textbf{s}alt \textbf{i}nitialization
+\textit{essiv:sha256}. Le vecteur d'initialisation est unique à chaque secteur
+du volume chiffré. Il doit donc être recalculé pour chaque secteur. Cela permet
+de ne pas avoir besoin de déchiffrer l'intégralité du volume pour accéder à une
+ressource placée à la fin des données chiffrées. Cela permet également
+paralléliser les processus gérant le chiffrement ou déchiffrement d'un même
+disque, puisque chaque secteur pourra être manié indépendamment des autres. Le
+premier type prend numéro du secteur concerné codé sur 32 ou 64 bits comme
+vecteur d'initialisation, tandis que \textit{essiv:sha256} (pour
+\textbf{e}ncrypted \textbf{s}ector-\textbf{s}alt \textbf{i}nitialisation
 \textbf{v}ector) calcule l'IV à partir d'une combinaison du numéro de secteur
 avec le hachage de la clé de chiffrement.
 \paragraph{}
@@ -208,7 +213,7 @@ avec le hachage de la clé de chiffrement.
 \end{figure}
 \paragraph{}
 Dans les métadonnées \textit{LUKS}, deux champs distincts permettent à
-\textit{dm-crypt} de connaitre l'algorithme de chiffrement utilisé ainsi que la
+\textit{dm-crypt} de connaître l'algorithme de chiffrement utilisé ainsi que la
 manière dont le vecteur d'initialisation \texttt{IV} est calculé:
 \begin{itemize}
 \item \textbf{Cipher name}: nom de l'algorithme de chiffrement utilisé
@@ -219,7 +224,7 @@ Dans les métadonnées \textit{GELI}, ces deux informations sont confondues dans
 le champs \textbf{ealgo} (\textit{encryption algorithm}). La variable est
 ensuite enregistrée et utilisée dans la structure \texttt{softc}. Le calcul de
 \textbf{IV} quant à lui est géré par la fonction \texttt{g\_eli\_crypto\_ivgen},
-qui est soit en mode \textit{plain64} lorsque l'algorithme \textbf{aes-xts} est
+qui est en mode \textit{plain64} lorsque l'algorithme \textbf{aes-xts} est
 utilisé, et \textit{essiv:sha256} autrement.
 \paragraph{}
 Par défaut, le type d'\textbf{IV} (le \texttt{cipher mode} dans \textit{LUKS})
@@ -233,14 +238,8 @@ dur:
   autrement
 \end{itemize}
 \paragraph{}
-Il est donc nécessaire d'adapter la fonction afin qu'elle prenne en compte les
-propriétés indiquées dans les métadonnées \textit{LUKS} lorsqu'elles sont mises
-au format \textit{GEOM ELI}. Il n'est cependant pas possible d'utiliser
-directement tous les algorithmes et modes possibles avec \textit{LUKS} sans
-modifier les structures \texttt{metadata} et \texttt{softc} héritées de
-\textit{GELI}. Ces structures étant utilisées par de nombreuses fonctions, leur
-modification nécessiterait celle d'une très grande partie du code. Le nombre de
-choix possibles est donc limité aux associations suivantes:
+En gardant la fonction \textit{GELI} calculant l'\textbf{IV} telle quelle, la
+liste d'algorithmes possibles se restreint aux choix suivants:
 \begin{center}
   \begin{tabular}{ | l | l | }
     \hline
@@ -252,6 +251,31 @@ choix possibles est donc limité aux associations suivantes:
     \hline
   \end{tabular}
 \end{center}
+\paragraph{}
+Cependant, \textit{LUKS} ne gérant pas l'authentification des données et
+\textit{GELI} le faisant, il est possible d'utiliser le champs \texttt{aalgo}
+devenu inutile, pour pouvoir stocker le \textit{cipher mode} indépendamment du
+\textit{cipher name}. En faisant cela, seule la fonction chargée du calcul de
+\textbf{IV} doit être modifiée, mais les structures \texttt{metadata} et
+\texttt{softc} héritées de \textit{GELI} restent inchangées.
+\paragraph{}
+Le nombre de choix possibles se limite maintenant aux associations suivantes:
+\begin{center}
+  \begin{tabular}{ | l | l | }
+    \hline
+    \textbf{Cipher name} & \textbf{Cipher mode}  \\
+    \hline
+    AES-XTS              & \texttt{plain64}      \\
+    AES-CBC              & \texttt{plain}        \\
+    AES-CBC              & \texttt{essiv:sha256} \\
+    CAST5-CBC            & \texttt{plain}        \\
+    \hline
+  \end{tabular}
+\end{center}
+\paragraph{}
+Cette limite est due à l'implémentation native des algorithmes dans le système,
+qui doivent à la fois être présents dans le standard \textit{LUKS} et supportés
+par \textit{FreeBSD}.
 
 
 \subsubsection{Noyau et espace utilisateur}
@@ -438,6 +462,43 @@ ce décalage. {\em GELI} ne réalisant pas cette opération, on rajoute
 à la structure {\em softc} un champ {\em sc\_offset} que l'on utilise dans les
 fonctions de lecture et écriture sur disque.
 
+
+\section{Gestion des disques}
+
+\subsubsection{Différences entre \textit{device-mapper} de Linux et
+  \textit{GEOM} de FreeBSD}
+\paragraph{}
+La principale différence entre ces deux systèmes se situe au niveau de
+l'emplacement des métadonnées.
+\paragraph{}
+Dans un système Linux, \textit{device-mapper} laisse à l'outil qui va l'utiliser
+(comme \textit{cryptsetup} qui passe par \textit{dm-crypt, une classe
+  \textit{device-mapper}}) la gestion totale des données sur le volume qui lui
+est présenté. Côté FreeBSD en revanche, un outil et une classe \texttt{GEOM}
+doit passer par les fonctions de base de \textit{GEOM}.
+
+\subsubsection{Application des fonctions \textit{GELI} à un disque chiffré \textit{LUKS}}
+\paragraph{}
+Dans notre cas, on appelle l'outil l'ensemble des commandes qui entrées par
+l'utilisateur afin de gérer le disque chiffré. Par défaut, l'outil \textit{GELI}
+appelle une fonction de \textit{GEOM} qui va chercher les métadonnées sur le
+volume pour les enregistrer dans une structure passée en paramètre. Cependant,
+cette fonction ne laisse pas le choix de leur emplacement et cherche à les lire
+directement à la fin du volume en fonction de sa taille et de la taille de la
+structure. Pour développer notre outil \textit{GLUKS} avec un fonctionnement
+semblable à celui de \textit{GELI}, il est nécessaire d'écrire une fonction
+similaire ayant pour vocation d'aller chercher ces métadonnées au début du
+disque plutôt qu'à la fin.
+\paragraph{}
+La classe \textit{GEOM} est l'ensemble des fonctions permettant la gestion de
+disque côté noyau. Pour la lecture et l'écriture des métadonnées, les fonctions
+de la classe \textit{GELI} ne dépendent pas de fonctions \textit{GEOM} de base.
+Elles cherchent toujours l'emplacement des métadonnées à la fin du volume mais
+calcule cette fois-ci elle-même l'\texttt{offset} à partir duquel elles se
+trouves. Afin d'adapter la classe \textit{GELI} à notre classe \textit{GLUKS},
+il est nécessaire de mettre cet \texttt{offset} à \texttt{0} à chaque fois qu'on
+aura de lire ou écrire des données sur le disque, qu'il s'agisse de métadonnées
+ou de données utiles. 
 
 \section{Passage de l'espace utilisateur au noyau}
 Nous avions donc besoin d'envoyer au noyau la phrase de passe, pour cela il a

@@ -385,7 +385,7 @@ les autres processus à lancer au démarrage.
 \end{figure}
 
 \paragraph{}
-Comme il existe plusieurs cas possible de partitionnement, on détaille dans la
+Comme il existe plusieurs cas possibles de partitionnement, on détaille dans la
 suite les principales solutions existantes.
 \\
 Sous Linux comme sous FreeBSD, la partition contenant la racine du système ne
@@ -403,7 +403,7 @@ une contenant le {\em /} et une autre le {\em /boot}.
 \paragraph{}
 Sous Linux, dans le cas d'un {\em /boot} séparé, le système démarre normalement,
 puis lorsque le l'Initrd est chargé, il charge les modules et lance les scripts
-(nommé hook) nécessaires pour démarrer, dont ceux permettant de monter la
+(nommés hook) nécessaires pour démarrer, dont ceux permettant de monter la
 racine. Un script est dédié au déchiffrement des disques, son nom et son chemin
 dans le système de fichier varie selon les distributions. Le script est donc
 lancé et permet de déchiffrer la partition chiffrée et donc le démarrage
