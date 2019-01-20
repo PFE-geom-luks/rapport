@@ -369,7 +369,15 @@ déchiffrement plus simple de la clé maître comme évoqué en \ref{sub:dechif_
 On implémente donc les différentes fonctions pour déchiffrer la clé maître à
 partir de la phrase de passe. Ce qui nous permet donc d'arriver à la création
 du disque déchiffré, après avoir traduit correctement les métadonnées de
-{\em GELI} en métadonnées {\em LUKS}.
+{\em GELI} en métadonnées {\em LUKS}, on obtient donc un fonctionnement
+comme décrit par le schéma \ref{fig:fonctionnement}
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{choix_developpement/utilisation_metadonnee_luks_2.png}
+\caption{\label{fig:fonctionnement}Fonctionnement de GEOM LUKS}
+\end{figure}
 
 \subsubsection{Champ drapeaux: \texttt{md\_flags}}
 \paragraph{}
