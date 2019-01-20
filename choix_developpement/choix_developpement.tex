@@ -503,9 +503,9 @@ disque côté noyau. Pour la lecture et l'écriture des métadonnées, les fonct
 de la classe \textit{GELI} ne dépendent pas de fonctions \textit{GEOM} de base.
 Elles cherchent toujours l'emplacement des métadonnées à la fin du volume mais
 calcule cette fois-ci elle-même l'\texttt{offset} à partir duquel elles se
-trouves. Afin d'adapter la classe \textit{GELI} à notre classe \textit{GLUKS},
+trouvent. Afin d'adapter la classe \textit{GELI} à notre classe \textit{GLUKS},
 il est nécessaire de mettre cet \texttt{offset} à \texttt{0} à chaque fois qu'on
-aura de lire ou écrire des données sur le disque, qu'il s'agisse de métadonnées
+aura à lire ou écrire des données sur le disque, qu'il s'agisse de métadonnées
 ou de données utiles. 
 
 \section{Passage de l'espace utilisateur au noyau}
