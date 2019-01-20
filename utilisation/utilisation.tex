@@ -10,16 +10,18 @@ pour arriver à sa version finale, bien que déjà disponible sous Linux. Pour
 pouvoir utiliser la partition au format LUKS sous FreeBSD il faut un système de
 fichier qui soit supporté par les deux systèmes d'exploitation. En listant
 les systèmes de fichiers disponibles, on peut noter que {\em XFS, EXT2, openZFS,
-FAT32, et NTFS} sont disponibles sous Linux et FreeBSD.
+FAT, FAT32, et NTFS} sont disponibles sous Linux et FreeBSD.
 
 \subsection{Le démarrage}
-Nous n'avons pas implémenter la partie s'occupant du démarrage sur une partition
+Nous n'avons pas implémenté la partie s'occupant du démarrage sur une partition
 chiffrée avec {\em LUKS}. Cependant pour démarrer sur un système dans lequel le
 {\em /boot} est séparé, il suffirait de peu de modification au code actuel pour
-permettre au noyau lors de son chargement d'ouvrir le {\em /} chiffré avec LUKS.
-
+permettre au noyau, lors de son chargement, d'ouvrir le {\em /} chiffré avec
+LUKS. Le fonctionnement du point de vue de l'utilisateur serait ainsi semblable
+à un système chiffré avec \textit{GELI}.
 
 \subsection{Partage de fichiers et haute disponibilité}
+\paragraph{}
 On peut donc imaginer des cas d'utilisation de LUKS sous FreeBSD permettant par
 exemple de partager des fichiers entre Linux et FreeBSD, et donc de faciliter
 l'installation de dual-boot Linux-FreeBSD. On peut également imaginer disposer
@@ -29,3 +31,8 @@ système en utilisant deux systèmes d'exploitation différents tout en conserva
 la propriété de confidentialité, en permettant uniquement à la machine qui
 utilise le disque de pouvoir le lire (et donc interdisant la machine hébergeant
 le disque de pouvoir lire son contenu).
+\paragraph{}
+Le partage de médias amovibles chiffrés avec \textit{LUKS} est également rendu
+possible entre les deux systèmes. Une simple clé USB ou un disque dur externe
+pourraient alors être chiffrés, en gardant la capacité d'être lus et écrits par
+les deux systèmes, sans modification particulière faite au préalable.
