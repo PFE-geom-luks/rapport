@@ -299,7 +299,10 @@ primaire fournie par les métadonnées, à partir de la version 6, la clé prima
 est dérivée en clés de chiffrement, qui diffèrent tout les 2\textasciicircum20 
 secteurs, soit 1048576 secteurs du disques. Les tailles des secteurs des 
 disques étant généralement de 512 octets ou 4096 octets, 
-donc tout les 500Mo ou 4Go environ.
+donc tout les 500Mo ou 4Go environ. Ce changement de clé tous les
+2\textasciicircum20 secteur est en effet recommandé par le standard {\em IEEE 1619-2007}.
+LUKS ne permet pas ce changement de clé tous les 2\textasciicircum20 secteurs,
+puisque {\em dm-crypt} ne le permet pas.
 La taille du secteur correspond au champs taille du secteur des métadonnées
 {\em GELI}.
 

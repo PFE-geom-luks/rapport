@@ -1,0 +1,38 @@
+\chapter{Difficultés rencontrées}
+
+\section{Développement noyau et débogage}
+
+\subsection{Développement noyau}
+
+\paragraph{}Nous avons du implémenter la majorité des fonctions dans le code du
+module noyau que nous avons créé à partir de {\em GELI}. Il a donc fallu se
+familiariser avec les différences entre noyau et espace utilisateur, on peut
+par exemple citer l'allocation dynamique ou encore les fonctions de chiffrement
+et de déchiffrement qui diffèrent.
+
+\paragraph{}
+Dans l'espace utilisateur la bibliothèque {\em Openssl} fournit la plupart des
+fonctions de chiffrement et de hashage, tandis que dans le noyau nous avons du
+utiliser l'API {\em Opencrypto}. De même, nous avons du nous familiariser avec
+l'API que propose {\em GEOM} pour comprendre les différents champs des
+structures et fonctions utilisées.
+
+\subsection{Débogage}
+\paragraph{}
+L'une des plus grosse difficultés provenait du fait, qu'en mode noyau,
+peu d'erreurs sont permises. Par exemple nous avons souvent du faire face à
+des erreurs de page ou des débordements mémoire qui ne sont alors pas
+rattrapables par le noyau, qui causait alors un plantage du noyau. Nous avons
+tout de même pris soin d'activer le débogage noyau dans FreeBSD, ce qui nous
+permettaient de récupérer une image mémoire du noyau que l'on pouvait exploiter
+ultérieurement avec un débogueur noyau.
+
+\paragraph{}Dans les cas où il n'y avait pas de plantage, l'utilisation de
+{\em printf} nous permettait de déboguer le programme en affichant la valeur
+de certaines variables, qui apparaissaient alors dans les messages envoyées par
+le noyau, que l'on peut consulter avec la commande {\em dmesg} sous la majorité
+des systèmes UNIX dont FreeBSD.
+
+
+
+

@@ -1,0 +1,31 @@
+\chapter{Utilisation de GEOM\_LUKS}
+
+\section{Compatibilité entre Linux et FreeBSD}
+
+\subsection{Le système de fichiers}
+Nous avons donc implémenté une première version d'un module noyau et de son
+utilitaire pour FreeBSD qui permet la lecture et l'écriture sur un volume chiffré
+avec le format LUKS1.0. La version 2.0 de LUKS est encore en développement,
+pour arriver à sa version finale, bien que déjà disponible sous Linux. Pour
+pouvoir utiliser la partition au format LUKS sous FreeBSD il faut un système de
+fichier qui soit supporté par les deux systèmes d'exploitation. En listant
+les systèmes de fichiers disponibles, on peut noter que {\em XFS, EXT2, openZFS,
+FAT32, et NTFS} sont disponibles sous Linux et FreeBSD.
+
+\subsection{Le démarrage}
+Nous n'avons pas implémenter la partie s'occupant du démarrage sur une partition
+chiffrée avec {\em LUKS}. Cependant pour démarrer sur un système dans lequel le
+{\em /boot} est séparé, il suffirait de peu de modification au code actuel pour
+permettre au noyau lors de son chargement d'ouvrir le {\em /} chiffré avec LUKS.
+
+
+\subsection{Partage de fichiers et haute disponibilité}
+On peut donc imaginer des cas d'utilisation de LUKS sous FreeBSD permettant par
+exemple de partager des fichiers entre Linux et FreeBSD, et donc de faciliter
+l'installation de dual-boot Linux-FreeBSD. On peut également imaginer disposer
+de systèmes Linux et FreeBSD pour réaliser la même opération sur un stockage
+réseau qui serait chiffré, avec LUKS, permettant d'accroître la disponiblité du
+système en utilisant deux systèmes d'exploitation différents tout en conservant
+la propriété de confidentialité, en permettant uniquement à la machine qui
+utilise le disque de pouvoir le lire (et donc interdisant la machine hébergeant
+le disque de pouvoir lire son contenu).

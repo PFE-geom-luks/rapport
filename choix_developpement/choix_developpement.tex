@@ -426,16 +426,47 @@ de phrases secrètes à indiquer dans les métadonnées.
 
 \subsubsection{Création du disque déchiffré}
 Avec {\em GEOM} l'API noyau de FreeBSD pour gérer les disques, lorsque l'on
-créé un disque à partir d'un autre, la structure comprends notamment, la taille
+créé un disque à partir d'un autre, la structure comprend notamment, la taille
 du disque, la taille d'un secteur. Pour calculer la taille du disque, il faut
 soustraire de la taille du de la partition complète, la taille de l'en-tête. 
-Avec les métadonnées de {\em LUKS} on a directement le champs {\em payloadoffset}
+Avec les métadonnées de {\em LUKS} on a directement le champ {\em payloadoffset}
 qui permet de connaître le nombre de secteurs qu'occupent l'en-tête. Comme sous
 {\em GELI} les métadonnées sont à la fin du disque, il n'y a pas de
 transformation à faire sur le numéro de secteur lors de lectures ou écritures.
 Cependant avec {\em LUKS}, comme les métadonnées sont au début, il faut prévoir
-ce décalage. {\em GELI} ne prévoyant pas de réaliser cette opération, on rajoute
+ce décalage. {\em GELI} ne réalisant pas cette opération, on rajoute
 à la structure {\em softc} un champ {\em sc\_offset} que l'on utilise dans les
 fonctions de lecture et écriture sur disque.
+
+
+\section{Passage de l'espace utilisateur au noyau}
+Nous avions donc besoin d'envoyer au noyau la phrase de passe, pour cela il a
+fallu comprendre comment l'utilitaire {\em geom\_eli} passait des commandes et
+des valeurs au module noyau {\em geli}. Le code de {\em GELI} a donc encore une
+fois servi d'exemple.
+
+\subsection{GEOM}
+\paragraph{}
+L'API {\em GEOM} s'utilise donc dans le noyau comme nous l'avons vu mais
+également sous la forme d'une bibliothèque que l'on utilise en espace
+utilisateur permettant de générer automatiquement la sortie de la commande 
+{\em help} pour l'utilitaire par exemple, et bien sur les fonctions permettant
+de changer de contexte en envoyant à la classe GEOM associée des commandes ainsi
+que des valeurs.
+
+\paragraph{}
+Pour générer la sortie de la commande help, ainsi que pour permettre à GEOM de
+vérifier la cohérence des commandes envoyées, la structure {\em g\_command} est
+déclarée dans le code source de l'utilitaire, le développeur n'a ensuite qu'à 
+utiliser les commandes conformément à la structure sans avoir besoin de
+l'utiliser. La structure est utilisée par la bibliothèque pour générér
+automatiquement la commande help et vérifier la cohérence des commandes passées
+au noyau. D'ailleurs concernant commandes,
+l'utilitaire sert en fait à remplir la structure {\em gctl\_req} à partir des
+entrées utilisateurs, puis de l'envoyer au noyau via la fonction
+{\em gctl\_issue}. Du côté noyau, une fonction permet selon le type de commande
+d'appeler la fonction adéquate avec en argument la structure gctl\_req reçue,
+dont les variables sont utilisée pour accomplir la tâche demandée.
+
 
 
