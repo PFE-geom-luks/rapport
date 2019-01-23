@@ -15,7 +15,11 @@ Dans l'espace utilisateur la bibliothèque {\em Openssl} fournit la plupart des
 fonctions de chiffrement et de hashage, tandis que dans le noyau nous avons du
 utiliser l'API {\em Opencrypto}. De même, nous avons du nous familiariser avec
 l'API que propose {\em GEOM} pour comprendre les différents champs des
-structures et fonctions utilisées.
+structures et fonctions utilisées. Concernant les algorithmes de hashage, l'API
+{\em Opencrypto} fourni les fonctions et types pour chaque algorithme, et c'est
+donc au développeur de s'adapter selon l'algorithme à utiliser. Du fait que
+les types pour chaque algorithme de hashage diffèrent (SHA1, SHA256, SHA512),
+on est contraint de répéter du code pour chaque algorithme.
 
 \subsection{Débogage}
 \paragraph{}
