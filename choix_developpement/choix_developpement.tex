@@ -537,5 +537,15 @@ entrées utilisateurs, puis de l'envoyer au noyau via la fonction
 d'appeler la fonction adéquate avec en argument la structure gctl\_req reçue,
 dont les variables sont utilisée pour accomplir la tâche demandée.
 
-
-
+\section{Confidentialité}
+\paragraph{}
+Comme nous l'avons constaté en utilisant le code de {\em GELI}, les variables
+qui contiennent des données qui pourraient porter atteinte à la confidentialité
+sont écrasée avec des zéros dès qu'elles ne sont plus utiles, y compris avant
+le retour de la fonction. Cela permet de rendre les attaques sur le module
+noyau ou la mémoire vive plus complexe, pour obtenir la clé de déchiffrement ou
+la phrase de passe du disque. En effet, on utilise l'instruction {\em bzero}
+sur les variables sensibles (la clé de chiffrement, la phrase de passe, la
+phrase de passe dérivée, etc.) dès que l'on peut. Ainsi une fois le disque
+monté, uniquement la clé de chiffrement est présente en mémoire pour pouvoir
+lire et écrire sur le disque chiffré.
