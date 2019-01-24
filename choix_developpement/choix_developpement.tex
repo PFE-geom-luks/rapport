@@ -194,17 +194,20 @@ génération du vecteur d'initialisation \textbf{IV}. Dans notre cas, l'algorith
 de chiffrement peut être \textbf{aes-xts}, \textbf{aes-cbc} ou
 \textbf{cast5-cbc}. Chacun de ces algorithmes n'accepte pas les même méthodes de
 génération de l'\textbf{IV}, qui peut être de type \textit{plain} (32 ou 64) ou
-\textit{essiv:sha256}. Le vecteur d'initialisation est unique à chaque secteur
-du volume chiffré. Il doit donc être recalculé pour chaque secteur. Cela permet
-de ne pas avoir besoin de déchiffrer l'intégralité du volume pour accéder à une
-ressource placée à la fin des données chiffrées. Cela permet également
-paralléliser les processus gérant le chiffrement ou déchiffrement d'un même
-disque, puisque chaque secteur pourra être manié indépendamment des autres. Le
-premier type prend numéro du secteur concerné codé sur 32 ou 64 bits comme
-vecteur d'initialisation, tandis que \textit{essiv:sha256} (pour
-\textbf{e}ncrypted \textbf{s}ector-\textbf{s}alt \textbf{i}nitialisation
-\textbf{v}ector) calcule l'IV à partir d'une combinaison du numéro de secteur
-avec le hachage de la clé de chiffrement.
+\textit{essiv:sha256}. Bien que le standard proposé par le créateur
+d'\textit{essiv} n'interdise pas l'utilisation d'autres algorithmes de hachage
+(comme le suggère la syntaxe de la commande), seul \texttt{SHA256} peut être
+utilisé avec \textit{essiv} dans \textit{cryptsetup}. Le vecteur
+d'initialisation est unique à chaque secteur du volume chiffré. Il doit donc
+être recalculé pour chaque secteur. Cela permet de ne pas avoir besoin de
+déchiffrer l'intégralité du volume pour accéder à une ressource placée à la fin
+des données chiffrées. Cela permet également paralléliser les processus gérant
+le chiffrement ou déchiffrement d'un même disque, puisque chaque secteur pourra
+être manié indépendamment des autres. Le premier type prend numéro du secteur
+concerné codé sur 32 ou 64 bits comme vecteur d'initialisation, tandis que
+\textit{essiv:sha256} (pour \textbf{e}ncrypted \textbf{s}ector-\textbf{s}alt
+\textbf{i}nitialisation \textbf{v}ector) calcule l'IV à partir d'une combinaison
+du numéro de secteur avec le hachage de la clé de chiffrement.
 \paragraph{}
 \begin{figure}[h]
 \centering
