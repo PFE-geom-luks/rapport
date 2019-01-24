@@ -230,6 +230,17 @@ l'arborescence peut se faire. On peut ensuite s'assurer de son contenu, en
 vérifiant par exemple celui d'un fichier texte qui a été créé sous Linux.
 \\
 \begin{lstlisting}[language=bash]
+  # Linux
+
+  cryptsetup luksOpen /dev/sdb1 luks_device
+  mount /dev/mapper/luks_device /mnt
+  
+  echo "geom_luks: aes-xts-plain64" > /mnt/file2.txt
+
+  unmount /mnt
+  cryptsetup luksClose luks_device
+\end{lstlisting}
+\begin{lstlisting}[language=bash]
   # FreeBSD
 
   gluks test_passphrase /dev/ada1p1
@@ -240,7 +251,16 @@ vérifiant par exemple celui d'un fichier texte qui a été créé sous Linux.
   unmount /mnt
   gluks detach /dev/ada1p1
 \end{lstlisting}
-% TODO: figure cat
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{tests/linux_write_file.png}
+  \caption{\label{fig:linux_write_file}Écriture d'un fichier depuis Linux}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{tests/freebsd_read_file.png}
+  \caption{\label{fig:freebsd_read_file}Lecture d'un fichier depuis FreeBSD}
+\end{figure}
 
 \subsection{Montage et écriture de données}
 \paragraph{}
@@ -256,7 +276,7 @@ ouvrant le disque avec \texttt{cryptsetup} puis en le montant.
   gluks test_passphrase /dev/ada1p1
   mount -t ext2fs /dev/ada1p1.luks /mnt
   
-  echo "Writing from FreeBSD: OK" > file2.txt
+  echo "Writing from FreeBSD: OK" > /mnt/file2.txt
 
   unmount /mnt
   gluks detach /dev/ada1p1
@@ -272,7 +292,16 @@ ouvrant le disque avec \texttt{cryptsetup} puis en le montant.
   unmount /mnt
   cryptsetup luksClose luks_device
 \end{lstlisting}
-% TODO: figure echo in FreeBSD, cat in Linux
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{tests/freebsd_write_file.png}
+  \caption{\label{fig:freebsd_write_file}Écriture d'un fichier depuis FreeBSD}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{tests/linux_read_file.png}
+  \caption{\label{fig:linux_read_file}Lecture d'un fichier depuis Linux}
+\end{figure}
 
 \subsection{Déchiffrement de disque avec différentes phrases secrètes}
 \paragraph{}
@@ -291,7 +320,12 @@ commandes suivantes:
 \end{lstlisting}
 Il est ainsi possible de retrouver dans des cas où les \texttt{slots} actifs ne
 sont pas consécutifs.
-% TODO: figure medatata 2 passphrases
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{tests/linux_multiple_passphrases.png}
+  \caption{\label{fig:linux_multiple_passphrases}Volume chiffré \textit{LUKS}
+    avec plusieurs phrases secrètes}
+\end{figure}
 \paragraph{}
 Afin de tester que le déchiffrement se fait correctement pour chaque phrase
 secrète, on reproduit les tests précédents pour chacune d'entre-elles.
