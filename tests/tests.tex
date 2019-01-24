@@ -13,7 +13,7 @@ en commun.
 
 \subsection{Installation des systèmes}
 \subsubsection{Linux}
-Le système Linux utilisé peut être n'importe-quelle distribution, tant qu'il est
+Le système Linux utilisé peut être n'importe quelle distribution, tant qu'il est
 possible d'y gérer des disques chiffrés avec le standard \textit{LUKS 1}. Pour
 cela, il est nécessaire que \texttt{cryptsetup} soit installé. La machine ne
 servira ensuite plus qu'à créer les volumes chiffrés avec différents algorithmes
@@ -210,7 +210,7 @@ besoin de monter le disque pour vérifier son contenu (figure
 \end{figure}
 \paragraph{}
 Dans le premier cas, une phrase secrète incorrecte a été entrée. Le système
-n'arrivant pas à déchiffrer la clé maître à partir de cette phrase, il a donc
+n'arrivant pas à déchiffrer la clé maître à partir de cette phrase, il n'a donc
 pas attaché le volume.
 \paragraph{}
 Dans le second cas, la phrase entrée était correcte. Le système a donc pu
@@ -306,7 +306,7 @@ ouvrant le disque avec \texttt{cryptsetup} puis en le montant.
 \subsection{Déchiffrement de disque avec différentes phrases secrètes}
 \paragraph{}
 Dans le stardard \textit{LUKS} comme dans \textit{GELI}, il est possible de
-déchiffré une partition avec différentes phrases secrètes. Cela est réalisé dans
+déchiffrer une partition avec différentes phrases secrètes. Cela est réalisé dans
 \textit{LUKS} en utilisant 8 \texttt{slots} prévus à cet effet, chacun
 correspondant à une phrase.
 Pour ajouter et enlever une phrase de déchiffrement à un disque, on utilise les
