@@ -256,10 +256,21 @@ ouvrant le disque avec \texttt{cryptsetup} puis en le montant.
   gluks test_passphrase /dev/ada1p1
   mount -t ext2fs /dev/ada1p1.luks /mnt
   
-  cat /mnt/file.txt # ecrit "geom_luks: aes-xts-plain64" sur la sortie standard
+  echo "Writing from FreeBSD: OK" > file2.txt
 
   unmount /mnt
   gluks detach /dev/ada1p1
+\end{lstlisting}
+\begin{lstlisting}[language=bash]
+  # Linux
+
+  cryptsetup luksOpen /dev/sdb1 luks_device
+  mount /dev/mapper/luks_device /mnt
+  
+  cat /mnt/file2.txt # ecrit "Writing from FreeBSD: OK" sur la sortie standard
+
+  unmount /mnt
+  cryptsetup luksClose luks_device
 \end{lstlisting}
 % TODO: figure echo in FreeBSD, cat in Linux
 
