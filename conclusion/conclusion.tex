@@ -2,10 +2,10 @@
 \section{Module noyau et utilitaire GEOM\_LUKS}
 
 \paragraph{}
-Pour l'instant le module noyau et l'utilitaire développé supportent l'ouverture
-d'un disque chiffré avec LUKS, et donc l'écriture et lecture d'un volume qui est
-chiffré avec le standard. Cependant le module ne supporte actuellement pas le
-standard dans son intégralité.
+Pour l'instant le module noyau et l'utilitaire développés supportent l'ouverture
+d'un disque chiffré avec {\em LUKS}, et donc l'écriture et la lecture d'un
+volume qui est chiffré avec le standard. Cependant le module ne supporte
+actuellement pas le standard dans son intégralité.
 
 %TODO: Ecrire un paragraphe ou tableau ou liste de ce qu'il manque ou ce qu'on a en fonction de ce qui est le plus court
 
@@ -17,25 +17,29 @@ faudrait probablement dans un premier temps factoriser le code, enlever les
 fonctions de {\em GELI} qui ne sont plus utiles, simplifier les fonctions en
 enlevant le code qui était utile sous {\em GELI} mais ne l'est plus sous
 {\em GLUKS}, on peut citer notamment tout ce qui est en rapport avec
-l'authentification des données sur le disque, ou encore les fonctions s'occupant de la dérivation de la
-clé de chiffrement. Il faudrait également développer les scripts de tests, 
-probablement en adaptant ceux de {\em GELI}, car l'utilitaire {\em geom\_luks} est
-très proche de {\em geom\_eli}. Enfin il faudrait s'assurer du respect des
-conventions de style de FreeBSD pour le noyau, et faire réaliser une revue de
-code par les développeur de FreeBSD.
+l'authentification des données sur le disque, ou encore les fonctions s'occupant
+de la dérivation de la clé de chiffrement. Par la suite, on pourrait modifier,
+voire se passer des structures \texttt{g\_luks\_metadata} et
+\texttt{g\_luks\_softc} héritées de {\em GELI} pour n'utiliser que celle de {\em
+  LUKS}. Il faudrait également développer les scripts de tests, probablement en
+adaptant ceux de {\em   GELI}, car l'utilitaire {\em geom\_luks} est très proche
+de {\em geom\_eli}. Enfin il faudrait s'assurer du respect des conventions de
+style de FreeBSD pour le noyau, et faire réaliser une revue de code par les
+développeurs de FreeBSD.
 
 \paragraph{}
-Concernant l'utilitaire, il permet actuellement d'attacher et détacher un volume chiffré :
-montrer le disque déchiffré pour permettre la lecture et l'écriture. Il permet
-également d'afficher les métadonnées stockées dans l'en-tête LUKS, ainsi que de
-lister les volumes actuellement attaché. Il reste donc les opérations de
-création, changement de clé, destruction. Il manque également le support de 
-fichiers clé, qui permettent de remplacer ou compléter la phrase de passe.
+Concernant l'utilitaire, il permet actuellement d'attacher et détacher un volume
+chiffré: montrer le disque déchiffré pour permettre la lecture et l'écriture. Il
+permet également d'afficher les métadonnées stockées dans l'en-tête {\em LUKS},
+ainsi que de lister les volumes actuellement attachés. Il reste donc les
+opérations de création, changement de clé, destruction. Il manque également le
+support de fichiers clé, qui permettent de remplacer ou compléter la phrase de
+passe.
 
 \paragraph{}
 Enfin pour son intégration dans FreeBSD, il serait possible d'ajouter le support
-du démarrage sur un volume chiffré avec LUKS, en ajoutant le code nécessaire
-au module noyau ainsi qu'au loader et éventuellement au bootloader si l'on veut
-supporter le démarrage sur un {\em /boot} chiffré.
+du démarrage sur un volume chiffré avec {\em LUKS}, en ajoutant le code
+nécessaire au module noyau ainsi qu'au {\em loader} et éventuellement au
+{\em bootloader} si l'on veut supporter le démarrage sur un {\em /boot} chiffré.
 
 
