@@ -13,6 +13,8 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{tabularx}
+\usepackage{float}
+\usepackage{xcolor}
 
 \lstset{language=C}
 
@@ -24,11 +26,16 @@
 \titlespacing*{\chapter}{0pt}{-19pt}{0pt}
 
 %\renewcommand{\thechapter}{\arabic{chapter}}
-
 %\renewcommand{\thesubsection}{\thesection. \arabic{subsection}}
-
 %\renewcommand{\thesubsubsection}{\thesubsection. \arabic{subsubsection}}
 
+\lstdefinelanguage{bash}{
+  basicstyle=\normalfont\ttfamily,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color[HTML]{EEEEEE},
+}
 
 \begin{document}
 \maketitle
