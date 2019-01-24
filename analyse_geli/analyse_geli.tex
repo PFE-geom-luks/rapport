@@ -14,7 +14,6 @@
 	\item zero\_intake\_passcache : appelle les deux fonctions précédentes
 	\item g\_eli\_crypto\_rerun : relance les opérations de chiffrement (EAGAIN from
 		crypto(9) )
-	\item g\_eli\_getattr\_done : 
 	\item g\_eli\_read\_done : appellée lorsque les données chiffrée sont lues sur le 
 		fournisseur (disque), elle appelle si tout c'est bien passé la partie
 		qui va déchiffrer (en ajoutant à une queue les données à déchiffrer)
@@ -24,7 +23,7 @@
 		être appellée)
 	\item g\_eli\_orphan : appellée quand l'un des parents de l'instance g\_eli 
 		devient absent, appelle g\_eli\_destroy si les métadonnées sont présentes
-	\item g\_eli\_start : appellée lorsque on commence une lecture ou écriture, 
+	\item g\_eli\_start : appellée lorsque on commence une lecture ou écriture, \\
 		filtre les IO (READ,WRITE,GETATTR,FLUSH, etc)
 	\item g\_eli\_newsession : initialise les fonctions de chiffrements (workers)
 	\item g\_eli\_freesession : libère les fonctions de chiffrement noyau (workers)
@@ -35,9 +34,7 @@
 	\item g\_eli\_worker : fonction principale du thread worker noyau quand il n'y a
 		pas d'accélération matérielle.
 	\item g\_eli\_read\_metadata : lis les métadonnées sur le disque
-	\item g\_eli\_last\_close :
 	\item g\_eli\_access : gère les droits d'accès (lecture, écriture, exclusivité)
-	\item g\_eli\_cpu\_is\_disabled
 	\item g\_eli\_create : initialise l'instance geli (lecture des métadonnées, etc)
 		créé le disque déchiffré
 	\item g\_eli\_destroy : supprime le disque déchiffré
@@ -72,7 +69,6 @@
 
 \paragraph{g\_eli\_crypto.c}
 \begin{itemize}
-	\item g\_eli\_crypto\_done : 
 	\item g\_eli\_crypto\_cipher : création du worker qui s'occupe du 
 		chiffrement
 	\item g\_eli\_crypto\_encrypt, g\_eli\_crypto\_decrypt : 
@@ -132,7 +128,6 @@ Il ne nous est donc pas utile pour porter LUKS.
 \paragraph{g\_eli\_key\_cache.c}
 \begin{itemize}
 	\item g\_eli\_key\_cmp : compare deux clés
-	\item g\_eli\_key\_fill : 
 	\item g\_eli\_key\_allocate : alloue une clé de chiffrement et la 
 		stocke dans une arbre et une queue
 	\item g\_eli\_key\_find\_last : renvoie la dernière clé ajoutée
@@ -154,12 +149,6 @@ Il ne nous est donc pas utile pour porter LUKS.
 	\item g\_eli\_crypto\_run : chiffre ou déchiffre des données
 \end{itemize}
 
-\paragraph{pkcs5v2.c}
-\begin{itemize}
-	\item
-	\item
-	\item
-\end{itemize}
 \subsubsection{Utilitaire espace utilisateur : sbin/geom/class/eli}
 \paragraph{geom\_eli.c}
 \begin{itemize}
@@ -169,29 +158,27 @@ Il ne nous est donc pas utile pour porter LUKS.
 	\item eli\_genkey\_files : 
 	\item eli\_genkey\_passphrase\_prompt : demande la phrase de passe à
 		l'utilisateur
-	\item eli\_genkey\_passphrase :
-	\item eli\_genkey :
-	\item eli\_metadata\_read :
-	\item eli\_metadata\_store :
-	\item eli\_init :
-	\item eli\_attach :
-	\item eli\_configure\_detached :
-	\item eli\_configure :
-	\item eli\_setkey\_attached :
-	\item eli\_setkey\_detached :
-	\item eli\_setkey :
-	\item eli\_delkey\_attached :
-	\item eli\_delkey\_detached :
-	\item eli\_delkey :
-	\item eli\_resume :
-	\item eli\_trash\_metadata :
-	\item eli\_kill\_detached :
-	\item eli\_kill :
-	\item eli\_backup\_create :
-	\item eli\_backup :
-	\item eli\_restore :
-	\item eli\_resize :
-	\item eli\_version :
-	\item eli\_clear :
-	\item eli\_dump :
+	\item eli\_genkey\_passphrase : génère une clé à partir de la phrase de
+		passe en utilisant pkcs5v2
+	\item eli\_genkey : génère la clé 
+	\item eli\_metadata\_read : lis les métadonnées
+	\item eli\_metadata\_store : stocke les métadonnées dans un fichier
+	\item eli\_init : créé un disque chiffré
+	\item eli\_attach : ouvre un disque chiffré
+	\item eli\_configure\_detached : configure un disque chiffré qui n'est pas ouvert
+	\item eli\_configure : configure un disque 
+	\item eli\_setkey\_attached : change la clé utilisateur d'un volume ouvert
+	\item eli\_setkey\_detached : change la clé utilisateur d'un volume fermé
+	\item eli\_setkey : change la clé utilisteur
+	\item eli\_delkey\_attached : supprime une clé utilisateur d'un volume ouvert
+	\item eli\_delkey\_detached : supprime une clé utilisateur d'un volume fermé
+	\item eli\_delkey : supprime une clé utilisateur d'un volume
+	\item eli\_resume : réouvre un disque 
+	\item eli\_backup\_create : créé une sauvegarde des métadonnées
+	\item eli\_backup : créé une sauvegarde des métadonnées
+	\item eli\_restore : restaure une sauvegarde des métadonnées
+	\item eli\_resize : change la taille d'un volume chiffré
+	\item eli\_version : donne la version du logiciel
+	\item eli\_clear : écrase par des zéros les métadonnées sur le disque
+	\item eli\_dump : affiche le contenu des métadonnées stockées sur le disque
 \end{itemize}

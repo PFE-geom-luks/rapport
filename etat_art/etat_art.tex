@@ -31,12 +31,13 @@ de passe dans le BIOS. Cela donne la possibilité à l'utilisateur de modifier s
 phrase secrète sans risquer de perdre ses données ou devoir rechiffrer ses
 données.
 
-\subsection{Chiffrement de disque logiciel}
+\subsection{Chiffrement logiciel de disque}
 \paragraph{}
 Le chiffrement de disque est généralement géré par le noyau du système, ou par
 des logiciels spécialisés comme TrueCrypt ou VeraCrypt sur Windows. Il permet de
-chiffrer et déchiffrer des partitions entières à la volée. Le disque, une fois
-déchiffré, peut-être montré comme n'importe quel autre espace de stockage. Son
+chiffrer et déchiffrer des partitions entières de manière transparente pour
+l'utilisateur. Le disque, une fois
+déchiffré, peut apparaître comme n'importe quel autre espace de stockage. Son
 utilisation est totalement transparente pour l'utilisateur.
 \paragraph{}
 Dans des systèmes comme Linux ou FreeBSD, le chiffrement et déchiffrement du
@@ -57,8 +58,9 @@ Le chiffrement de système de fichiers, ou système de fichiers chiffré, consis
 à confier le rôle de chiffrement et déchiffrement au sytème de fichiers, qui
 peut alors chiffrer les fichiers, leurs métadonnées ainsi que l'arborescence,
 selon les implémentations. Ce type de système de fichier chiffre alors
-automatiquement les fichiers qui y sont stockés; le chiffrement se fait à la
-volée. C'est notamment la technologie utilisée par l'\textit{Encrypting File
+automatiquement les fichiers qui y sont stockés; le chiffrement se fait de manière
+transparente pour l'utilisateur.
+C'est notamment la technologie utilisée par l'\textit{Encrypting File
   System} (abrégé EFS), une technologie Microsoft disponible dès la troisième
 version des systèmes de fichiers NTFS. D'autres solutions existent également,
 comme EncFS. Des logiciels comme TrueCrypt/VeraCrypt permettent également de
@@ -90,8 +92,9 @@ le format du fichier en clair.
 \section{Chiffrement de disque sur Linux et FreeBSD}
 
 \paragraph{}
-Le chiffrement de disque sous Linux et FreeBSD est un chiffrement à la volée. Il
-est géré par des modules noyaux qui interviennent au moment de la lecture et
+Le chiffrement de disque sous Linux et FreeBSD est un chiffrement qui s'effectue
+de manière transparente pour l'utilisateur.
+Il est géré par des modules noyaux qui interviennent au moment de la lecture et
 l'écriture sur disque. Les opérations qu'ils réalisent sont totalement
 transparentes du point de vue de l'utilisateur, qui ne manipule que des données
 en clair.
@@ -127,7 +130,7 @@ noyau {\em dm-crypt}, qui est un module qui dépend du module plus général
 (RAID, LVM, Cache, ...).
 Le module {\em dm-crypt} gère la table appelée {\em crypt table}
 qui permet d'associer un device à un chiffrement notamment. La table permet
-la lecture des données sur le disque. À celà s'ajoute le programme 
+la lecture des données sur le disque. À cela s'ajoute le programme 
 {\em cryptsetup} qui permet de lire des métadonnées stockées sur le disque 
 pour remplir la {\em crypt table}.
 Le programme s'occupe notamment du déchiffrement de la clé, de 
@@ -143,21 +146,21 @@ donc la suivante :
 
 \paragraph{}
 L'organisation reflétée par les programmes l'est également au niveau du code source,
-le module {\em dm-crypt} est n'a pas connaissance de l'existance de métadonnées ainsi 
+le module {\em dm-crypt} n'a pas connaissance de l'existance de métadonnées ainsi 
 que de leur format. On a donc le module {\em device-mapper \em et \em dm-crypt}
-qui font partie du code du noyau {\em Linux}, tandis que {\em Crypsetup} est un 
+qui font parties du code du noyau {\em Linux}, tandis que {\em Crypsetup} est un 
 programme qui est usuellement fourni avec {\em Linux} en tant qu'utilitaire, 
-qui est géré par une équipe indépendante de celle du noyau {\em Linux}. De plus 
-{\em dm-crypt} est n'a pas connaissance des algorithmes de chiffrement disponibles,
+qui est géré par une équipe indépendante de celle du noyau {\em Linux}. De plus, 
+{\em dm-crypt} n'a pas connaissance des algorithmes de chiffrement disponibles,
 le module s'appuie sur l'API de cryptographie du noyau.
 
 \paragraph{}
 Dans le cas de {\em FreeBSD}, le module noyau qui est en charge des
 transformations sur les disques est {\em GEOM}. Comme sous {\em Linux}, 
 il existe des modules qui vont interagir avec {\em GEOM} pour fournir des 
-fonction de RAID, de cache, et également de chiffrement. 
-Ces modules sont appelés {\em Classes GEOM}, 
-celle qui fournit le chiffrement est nommée {\em ELI}, le module noyau associé 
+fonctions de RAID, de cache, et également de chiffrement. 
+Ces modules sont appelés {\em Classes GEOM}. 
+Celle qui fournit le chiffrement est nommée {\em ELI}. Le module noyau associé 
 est ainsi appelé {\em GELI}. Le module contrairement à {\em dm-crypt}, 
 comprend toute la logique des métadonnées, ainsi que des algorithmes de 
 chiffrement disponibles. L'outil en espace utilisateur tire son code source
@@ -180,7 +183,7 @@ format. On a donc l'organisation suivante sous FreeBSD:
 \subsection{Format sur disque}
 \paragraph{}
 Le format sur disque désigne l'organisation des données et métadonnées sur le 
-disque. L'idée générale étant de stocker sur une partie du disque les 
+disque. L'idée générale est de stocker sur une partie du disque les 
 informations permettant de déchiffrer une autre partie du disque.
 \paragraph{}
 Comme le noyau {\em Linux} ne contient pas de format de métadonnées, 
@@ -203,7 +206,7 @@ précédant les données chiffrées.
 Les métadonnées de {\em LUKS} contenant les algorithmes de chiffrement, 
 d'authentification, la version de {\em LUKS}, sont suivis de huit emplacements 
 permettant de stocker des clés chiffrées, qui permettent de déchiffrer le 
-disque. Ainsi on peut stocker la même clé huit fois, protégées par des mots de 
+disque. Ainsi, on peut stocker la même clé huit fois, chacun protégées par des mots de 
 passe différents, permettant ainsi à plusieurs utilisateurs de déchiffrer le 
 même disque sans pour autant partager le même mot de passe.
 
@@ -295,15 +298,15 @@ algorithme déterministe en des clés utilisées pour chiffrer les données,
 qui dépendent de la version de {\em GELI} et de l'utilisation 
 d'authentification des données \cite{manGeli}. 
 La version 5 de {\em GELI} utilisait une seule clé, qui était la clé
-primaire fournie par les métadonnées, à partir de la version 6, la clé primaire
-est dérivée en clés de chiffrement, qui diffèrent tout les 2\textasciicircum20 
+primaire fournie par les métadonnées. A partir de la version 6, la clé primaire
+est dérivée en clés de chiffrement, qui diffèrent tous les 2\textasciicircum20 
 secteurs, soit 1048576 secteurs du disques. Les tailles des secteurs des 
 disques étant généralement de 512 octets ou 4096 octets, 
-donc tout les 500Mo ou 4Go environ. Ce changement de clé tous les
-2\textasciicircum20 secteur est en effet recommandé par le standard {\em IEEE 1619-2007}.
+donc tous les 500Mo ou 4Go environ. Ce changement de clé tous les
+2\textasciicircum20 secteurs est en effet recommandé par le standard {\em IEEE 1619-2007}.
 LUKS ne permet pas ce changement de clé tous les 2\textasciicircum20 secteurs,
 puisque {\em dm-crypt} ne le permet pas.
-La taille du secteur correspond au champs taille du secteur des métadonnées
+La taille du secteur correspond au champ taille du secteur des métadonnées
 {\em GELI}.
 
 \subsubsection{Algorithmes d'authentification (HMAC)}
@@ -320,7 +323,7 @@ Les algorithmes d'authentification disponibles sous {\em GELI} sont:
 
 \paragraph{}
 Dans le cas de {\em LUKS}, le chiffrement avec de l'authentification des 
-données n'est pas supporté, cependant le service d'intégrité peut être rendu 
+données n'est pas supporté. Cependant le service d'intégrité peut être rendu 
 par le module {\em dm-verity} ou {\em dm-integrity}, le format des métadonnées 
 est spécifié indépendamment de {\em LUKS}. Dans le cas où l'on souhaite faire 
 du chiffrement et de l'authentification il est alors conseillé d'utiliser le 
@@ -350,12 +353,12 @@ contrairement à {\em GELI}, qui ne le supporte pas car {\em FreeBSD} ne
 supporte pas l'hibernation sur disque. Les deux systèmes permettent le 
 renforcement de phrases de passe, via la fonction {\em PBKDF2} décrite 
 par le standard {\em PKCS\#5v2}. Les deux formats de métadonnées 
-permettent l'utilisation de plusieurs phrase de passe pour chiffrer la clé.
+permettent l'utilisation de plusieurs phrases de passe pour chiffrer la clé.
 
 \subsection{Démarrage sur une partition chiffrée}
 \paragraph{}
 L'intégration avec le démarrage permet notamment d'avoir la racine du système 
-de fichier sur une partition chiffrée, et même éventuellement le {\em /boot}
+de fichiers sur une partition chiffrée, et même éventuellement le {\em /boot}
 dans lequel sont usuellement stockés les fichiers permettant de démarrer le 
 système d'exploitation.
 
@@ -368,11 +371,11 @@ le démarrage sur ce système est possible.
 On propose de rappeler la séquence de démarrage pour la suite.
 \\
 Le BIOS est le premier programme qui démarre et permet de lancer le chargeur d'amorçage, 
-qui se charge de lancer le système, en lançant l'inital ramdisk, qui est un noyau
+qui se charge de lancer le système, en lançant l'inital ramdisk. Ce dernier est un noyau
 allégé, permettant de préparer notamment le disque lorsqu'il utilise LVM, du 
 RAID, ou encore du chiffrement. Le noyau contient le minimum et les modules
 nécessaires sont chargés au démarrage. Cela permet de réduire la taille du noyau
-à charger en RAM, tout en supportant un grand nombre de matériel. L'initial
+à charger en RAM, tout en supportant un grand nombre de matériels. L'initial
 ramdisk se charge donc de charger les modules qui correspondent au matériel de
 la machine, puis lance le premier processus appelé Init qui se charge de lancer
 les autres processus à lancer au démarrage.
@@ -393,8 +396,8 @@ contient pas nécessairement le dossier {\em /boot} qui peut être stocké sur u
 partition différente. Il y a alors deux cas, soit la partition {\em /boot} est
 chiffrée, soit elle ne l'est pas. Le premier cas est alors identique à une seule
 partition chiffrée contenant également le {\em /boot} (en ignorant les
-différences concernant le système de fichier ainsi que la possiblité de séparer
-d'autres dossier sur des partitions différentes). Dans le cas d'un {\em /boot}
+différences concernant le système de fichiers ainsi que la possiblité de séparer
+d'autres dossiers sur des partitions différentes). Dans le cas d'un {\em /boot}
 en clair, il est plus courant de trouver une configuration avec deux partitions,
 une contenant le {\em /} et une autre le {\em /boot}.
 
@@ -402,10 +405,10 @@ une contenant le {\em /} et une autre le {\em /boot}.
 
 \paragraph{}
 Sous Linux, dans le cas d'un {\em /boot} séparé, le système démarre normalement,
-puis lorsque le l'Initrd est chargé, il charge les modules et lance les scripts
+puis lorsque l'Initrd est chargé, il charge les modules et lance les scripts
 (nommés hooks) nécessaires pour démarrer, dont ceux permettant de monter la
 racine. Un script est dédié au déchiffrement des disques, son nom et son chemin
-dans le système de fichier varie selon les distributions. Le script est donc
+dans le système de fichiers varie selon les distributions. Le script est donc
 lancé et permet de déchiffrer la partition chiffrée et donc le démarrage
 peut continuer normalement.
 
@@ -424,11 +427,11 @@ avec LUKS.
 
 \paragraph{}
 
-Il faut bien noter la différence entre les deux cas, dans le premier un script
+Il faut bien noter la différence entre les deux cas. Dans le premier, un script
 s'occupe de déchiffrer le disque en utilisant le module noyau dm-crypt qui sera
 chargé, et donc le script sera en mesure de déchiffrer n'importe quel type de
-volume chiffré compatible avec dm-crypt. Tandis que dans le second cas, le
-déchiffrement du disque n'est possible que pour des disque chiffré avec LUKS.
+volume chiffré compatible avec dm-crypt. Dans le second cas, le
+déchiffrement du disque n'est possible que pour des disque chiffrés avec LUKS.
 Pour l'instant seul le format 1.0 de LUKS est d'ailleurs supporté par GRUB2.
 
 \subsubsection{Démarrage sur une partition chiffrée sous FreeBSD avec GELI}
@@ -437,18 +440,18 @@ Pour l'instant seul le format 1.0 de LUKS est d'ailleurs supporté par GRUB2.
 Dans le cas de FreeBSD avec un {\em /boot} séparé, c'est tout simplement au
 noyau de déchiffrer le disque pour le monter. Cela est réalisé en chargant
 le module {\em geom\_eli}, qui va alors chercher toutes les partitions qui sont
-de type {\em GELI} et va alors proposer de les déchiffrer. Cette étape est
+de type {\em GELI} et va proposer de les déchiffrer. Cette étape est
 équivalente à celle de l'Initrd de Linux.
 
 \paragraph{}
 Dans le cas d'une seule partition contenant le {\em /} et le {\em /boot}, comme
 la chaîne de démarrage comprend plusieurs étapes, c'est d'abord à {\em boot2}
 (la dernière étape du chargeur d'amorçage) de déchiffrer le disque pour charger le chargeur
-de FreeBSD, qui va alors avoir besoin de déchiffrer le disque pour pouvoir
+de FreeBSD. Ce dernier va alors avoir besoin de déchiffrer le disque pour pouvoir
 utiliser les noyaux disponibles notamment. Enfin dans le noyau, le module
 {\em geom\_eli} va permettre de déchiffrer la partition contenant la racine.
-Pour éviter d'avoir à taper la phrase de passe plusieurs fois, la phrase de
-passe est passée via des zones mémoires partagées aux différents parties :
+Pour éviter d'avoir à taper la phrase de passe plusieurs fois, celle-ci
+est passée via des zones mémoires partagées aux différents parties :
 {\em boot2} donne la phrase de passe au {\em chargeur} qui la donne au noyau.
 
 

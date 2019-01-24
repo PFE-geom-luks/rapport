@@ -8,7 +8,7 @@ L'analyse de \textit{LUKS} et \textit{GELI} nous a montré les similitudes et
 différences que présentent ces deux systèmes.
 
 \paragraph{}
-Pour n'importe-quel module noyau utilisant la classe \textit{GEOM} de
+Pour n'importe quel module noyau utilisant la classe \textit{GEOM} de
 \textit{FreeBSD}, les métadonnées sont toujours placées à la fin des données du
 disque, contrairement à \textit{LUKS}. Il faut donc créer les fonctions
 utilisant celles fournies par \textit{GEOM} afin de réaliser cette opération.
@@ -147,8 +147,8 @@ la clé de chiffrement sur le disque.
 La clé de chiffrement est hachée selon l'algorithme spécifié par le champ
 {\em hash-spec}, et stockée dans le champ {\em mkdigest} (Master Key Digest).
 
-L'en-tête {\em LUKS} permet de stocker la même clé chiffrée avec huits phrases
-de passe différentes, dans les huits {\em KeySlot} définis par le standard.
+L'en-tête {\em LUKS} permet de stocker la même clé chiffrée avec huit phrases de passe
+différentes, dans les huit {\em KeySlot} définis par le standard.
 \\
 Pour un keyslot, la phrase de passe est dérivée selon l'aglorithme {\em PKCS5v2}
 avec comme fonction pseudo aléatoire l'algorithme de hashage spécifié par 
@@ -169,9 +169,9 @@ c'est le même pour toutes les phrases de passe.
 Dans {\em GELI} la phrase de passe est dérivée en espace utilisateur avant
 d'être envoyée en espace noyau, qui déchiffrera ensuite la clé de chiffrement.
 Or si l'on applique le même procédé pour {\em LUKS}, il faut alors dans le cas
-où les 8 {\em keyslot} sont actifs, envoyer 8 phrases de passe dérivées au
-noyau. Il est donc plus simple d'envoyer la phrase de passe directement au
-noyau, qui effectuera donc tous les calculs.
+où les 8 {\em keyslot} sont actifs, envoyer 8 phrases de passe dérivées au noyau.
+Il est donc plus simple d'envoyer la phrase de passe directement au noyau, qui
+effectuera donc tous les calculs.
 
 \subsubsection{Choix concernant la clé de chiffrement}
 \paragraph{}
@@ -293,7 +293,7 @@ par \textit{FreeBSD}.
 Certains paramètres, indispensables à \textit{GELI} pour manipuler des disques
 chiffrés, n'ont pas d'équivalents dans les métadonnées \textit{LUKS} et ne
 peuvent donc pas être traduits d'un standard à l'autre. Il peuvent correspondre
-par exemple à l'authentification des données, prise en charge par \textit{GELI}
+par exemple à l'authentification des données, prisent en charge par \textit{GELI}
 mais pas \textit{LUKS}. D'autres champs décrivent comment sont chiffrées les
 données, en dehors des algorithmes utilisés.
 \paragraph{}
@@ -393,9 +393,9 @@ doivent passer par les fonctions de base de \textit{GEOM}.
 
 \subsubsection{Application des fonctions \textit{GELI} à un disque chiffré \textit{LUKS}}
 \paragraph{}
-Dans notre cas, on appelle l'outil l'ensemble des commandes qui sont entrées par
-l'utilisateur afin de gérer le disque chiffré. Par défaut, l'outil \textit{GELI}
-appelle une fonction de \textit{GEOM} qui va chercher les métadonnées sur le
+Dans notre cas, on appelle outil ou utilitaire l'ensemble des commandes qui sont entrées par
+l'utilisateur afin de gérer le disque chiffré. Cela correspond au programme en espace utilisateur.
+Par défaut, l'outil \textit{GELI} appelle une fonction de \textit{GEOM} qui va chercher les métadonnées sur le
 volume pour les enregistrer dans une structure passée en paramètre. Cependant,
 cette fonction ne laisse pas le choix de leur emplacement et cherche à les lire
 directement à la fin du volume en fonction de sa taille et de la taille de la
@@ -405,7 +405,7 @@ similaire ayant pour vocation d'aller chercher ces métadonnées au début du
 disque plutôt qu'à la fin.
 
 \section{Noyau et espace utilisateur}
-Nous avions donc besoin d'envoyer au noyau la phrase de passe, pour cela il a
+Nous avions donc besoin d'envoyer au noyau la phrase de passe. Pour cela il a
 fallu comprendre comment l'utilitaire {\em geom\_eli} passait des commandes et
 des valeurs au module noyau {\em geli}. Le code de {\em GELI} a donc encore une
 fois servi d'exemple.
@@ -414,15 +414,15 @@ fois servi d'exemple.
 \paragraph{}
 L'API {\em GEOM} s'utilise donc dans le noyau comme nous l'avons vu mais
 également sous la forme d'une bibliothèque que l'on utilise en espace
-utilisateur permettant de générer automatiquement la sortie de la commande 
+utilisateur. Elle permet de générer automatiquement la sortie de la commande 
 {\em help} pour l'utilitaire par exemple, et bien sur les fonctions permettant
-de changer de contexte en envoyant à la classe {\em GEOM} associée des commandes
+de changer de contexte en envoyant, à la classe {\em GEOM} associée, des commandes
 ainsi que des valeurs.
 
 \paragraph{}
 Pour générer la sortie de la commande help, ainsi que pour permettre à {\em
   GEOM} de vérifier la cohérence des commandes envoyées, la structure {\em
-  g\_command} est déclarée dans le code source de l'utilitaire, le développeur
+  g\_command} est déclarée dans le code source de l'utilitaire. Le développeur
 n'a ensuite qu'à utiliser les commandes conformément à la structure sans avoir
 besoin de l'utiliser. La structure est utilisée par la bibliothèque pour générer
 automatiquement la commande {\em help} et vérifier la cohérence des commandes
@@ -479,7 +479,7 @@ présence des 4 fichiers suivants :
 Le fichier {\em g\_eli\_crypto.c} contient les fonctions permettant de réaliser
 du chiffrement et déchiffrement qui sont donc implémentées deux fois (une fois
 pour le noyau, une autre pour l'espace utilisateur). Le fichier
-{\em g\_eli\_hmac.c} contient quand à lui une implémentation des fonctions
+{\em g\_eli\_hmac.c} contient quant à lui une implémentation des fonctions
 permettant de calculer des HMAC avec l'algorithme SHA512. Une seule implémentation
 est présente, elle est compatible entre le noyau et l'espace utilisateur, du fait
 que les fonctions et types associés à SHA512 sont les mêmes entre le noyau et

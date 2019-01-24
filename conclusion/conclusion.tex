@@ -28,18 +28,16 @@ conventions de style de FreeBSD pour le noyau, et faire réaliser une revue de
 code par les développeurs de FreeBSD.
 
 \paragraph{}
-Concernant l'utilitaire, il permet actuellement d'attacher et détacher un volume
-chiffré: montrer le disque déchiffré pour permettre la lecture et l'écriture. Il
-permet également d'afficher les métadonnées stockées dans l'en-tête {\em LUKS},
-ainsi que de lister les volumes actuellement attachés. Il reste donc les
-opérations de création, changement de clé, destruction. Il manque également le
-support de fichiers clé, qui permettent de remplacer ou compléter la phrase de
-passe.
+Concernant l'utilitaire, il permet actuellement d'attacher (montrer le disque 
+déchiffré au système pour permettre la lecture et l'écriture) et détacher un
+volume chiffré. Il permet
+également d'afficher les métadonnées stockées dans l'en-tête {\em LUKS}, ainsi que de
+lister les volumes actuellement attaché. Il reste donc les opérations de
+création, changement de clé, destruction. Il manque également le support de 
+fichiers clé, qui permettent de remplacer ou compléter la phrase de passe.
 
 \paragraph{}
 Enfin pour son intégration dans FreeBSD, il serait possible d'ajouter le support
-du démarrage sur un volume chiffré avec {\em LUKS}, en ajoutant le code
-nécessaire au module noyau ainsi qu'au {\em loader} et éventuellement au
-{\em bootloader} si l'on veut supporter le démarrage sur un {\em /boot} chiffré.
-
-
+du démarrage sur un volume chiffré avec {\em LUKS}, en ajoutant le code nécessaire
+au module noyau ainsi qu'au chargeur et éventuellement au chargeur d'amorçage
+si l'on veut supporter le démarrage sur un {\em /boot} chiffré.
