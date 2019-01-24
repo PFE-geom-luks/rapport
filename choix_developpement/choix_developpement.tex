@@ -2,7 +2,7 @@
 
 \section{Les métadonnées}
 \subsection{Utilisation des métadonnées stockées sur le disque dans le code
-source de GELI}
+  source de \textit{GELI}}
 \label{ssec:md_usage}
 L'analyse de \textit{LUKS} et \textit{GELI} nous a montré les similitudes et
 différences que présentent ces deux systèmes.
@@ -27,9 +27,9 @@ de celles de \textit{GELI}:
 \item le \textit{MAGIC}
 \item la version utilisée
 \item l'algorithme de chiffrement
-\item l'algorithme de hashage
+\item l'algorithme de hachage
 \item le sel
-\item le nombre d'itérations PKCS
+\item le nombre d'itérations \textit{PKCS}
 \item la \textit{masterkey} chiffrée
 \end{itemize}
 
@@ -38,21 +38,20 @@ Les métadonnées sont donc stockées sur le disque et sont mappées en mémoire
 la structure {\em md} de type {\em g\_eli\_metadata}. Mais des métadonnées 
 "indirectes" sont aussi présentes en mémoire à travers la structure {\em softc} 
 de type {\em g\_eli\_softc}. Comme illustré par le schéma \ref{fig:softc_eli} 
-cette structure diffère des 
-métadonnées à proprement parler. En effet les métadonnées évoquées jusqu'ici sont
-celles qui sont stockées telles quelles sur le disque à l'encodage près. Les 
-données privées de l'instance GEOM sont stockées dans une structure présente 
-uniquement en mémoire et dont les champs sont remplis par les métadonnées du 
-disque, mais aussi par des informations sur le disque comme sa taille ou encore 
-la taille des secteurs. Enfin les clés de chiffrement qui sont dérivées à partir
-de la clé maître y sont également stockées sous la forme d'un arbre et d'une 
-queue.
+cette structure diffère des métadonnées à proprement parler. En effet les
+métadonnées évoquées jusqu'ici sont celles qui sont stockées telles quelles sur
+le disque à l'encodage près. Les données privées de l'instance GEOM sont
+stockées dans une structure présente  uniquement en mémoire et dont les champs
+sont remplis par les métadonnées du disque, mais aussi par des informations sur
+le disque comme sa taille ou encore la taille des secteurs. Enfin, les clés de
+chiffrement qui sont dérivées à partir de la clé maître y sont également
+stockées sous la forme d'un arbre et d'une queue.
 
 \paragraph{}
 \begin{figure}[h]
-\centering
-\includegraphics[width=.6\linewidth]{choix_developpement/utilisation_metadonnee.png}
-\caption{\label{fig:softc_eli}Métadonnées en mémoire}
+  \centering
+  \includegraphics[width=.6\linewidth]{choix_developpement/utilisation_metadonnee.png}
+  \caption{\label{fig:softc_eli}Métadonnées en mémoire}
 \end{figure}
 
 \subsection{Transformation des métadonnées de LUKS en métadonnées GELI}
@@ -72,86 +71,91 @@ privées de l'instance GEOM. Leur modification équivaudrait à une refonte asse
 importante du code.
 \paragraph{}
 \begin{figure}[h]
-\centering
-\includegraphics[width=.9\linewidth]{choix_developpement/fonctions_g_luks_metadata.png}
-\caption{\label{fig:fonctions_md}Fonctions utilisant les métadonnées}
+  \centering
+  \includegraphics[width=.9\linewidth]{choix_developpement/fonctions_g_luks_metadata.png}
+  \caption{\label{fig:fonctions_md}Fonctions utilisant les métadonnées}
 \end{figure}
 \paragraph{}
 \begin{figure}[h]
-\centering
-\includegraphics[width=.9\linewidth]{choix_developpement/fonctions_g_luks_softc.png}
-\caption{\label{fig:fonctions_sc}Fonctions utilisant la structure \texttt{softc}}
+  \centering
+  \includegraphics[width=.9\linewidth]{choix_developpement/fonctions_g_luks_softc.png}
+  \caption{\label{fig:fonctions_sc}Fonctions utilisant la structure \texttt{softc}}
 \end{figure}
 \paragraph{}
 C'est pourquoi, la solution la plus intéressante serait de garder la structure
-de \textit{GELI} et d'y mettre les informations de chiffrement. Cela permettra 
-notamment d'écrire et/ou de modifier moins de code et donc de limiter les erreurs
-et de faciliter la maintenabilité. De plus en choisissant de procéder ainsi, on
-peut modifier le code facilement par itérations en le gardant compilable et 
-exécutable. On choisit donc de conserver le code de 
-GELI le plus possible et de transformer les métadonnées de LUKS en métadonnées 
-GELI.
+de \textit{GELI} et d'y mettre les informations de chiffrement. Cela permettrait
+notamment d'écrire et/ou de modifier moins de code, pour limiter les erreurs et
+et faciliter la maintenabilité. De plus en choisissant de procéder ainsi, on
+peut modifier le code facilement par itération en le gardant compilable et
+exécutable. On choisit donc de conserver le code de \textit{GELI} le plus
+possible et de transformer les métadonnées de \textit{LUKS} en métadonnées
+\textit{GELI}.
 
 \paragraph{}
-En effet bien que les métadonnées stockées sur le disque soient différentes 
-entre GELI et LUKS, le chiffrement du disque reste essentiellement identique :
-on utilise une clé maître et un algorithme de chiffrement de blocs. Cependant 
-comme décrit auparavant, la clé maître dans GELI est dérivée en clés de 
-chiffrement. Toutefois, GELI laisse la possibilité à travers des {\em Flags} 
-d'utiliser la clé maître comme unique clé de chiffrement.
+En effet bien que les métadonnées stockées sur le disque soient différentes
+entre \textit{GELI} et \textit{LUKS}, le chiffrement du disque reste
+essentiellement identique: on utilise une clé maître et un algorithme de
+chiffrement de blocs. Cependant, comme décrit auparavant, la clé maître dans
+\textit{GELI} est dérivée en clés de chiffrement. Toutefois, \textit{GELI}
+laisse la possibilité à travers des {\em Flags} d'utiliser la clé maître comme
+unique clé de chiffrement.
 
 \paragraph{}
 Comme décrit en \ref{ssec:md_usage}, les métadonnées utilisées par l'instance
-GEOM sont celles qui sont stockées dans la stucture {\em softc}, à l'exception
-de la lecture sur disque des métadonnées et de leur vérification ainsi que le 
-changement des métadonnées sur le disque (changement de la phrase de passe et
-donc de la clé chiffrée sur le disque).
+\textit{GEOM} sont celles qui sont stockées dans la stucture {\em softc}, à
+l'exception de la lecture sur disque des métadonnées et de leur vérification,
+ainsi que le  changement des métadonnées sur le disque (changement de la phrase
+de passe et donc de la clé chiffrée sur le disque).
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=.9\linewidth]{choix_developpement/utilisation_metadonnee_luks.png}
-\caption{\label{fig:transformation_md}Transformation des métadonnées}
+  \centering
+  \includegraphics[width=.9\linewidth]{choix_developpement/utilisation_metadonnee_luks.png}
+  \caption{\label{fig:transformation_md}Transformation des métadonnées}
 \end{figure}
 
 \paragraph{}
-La transformation des métadonnées LUKS en métadonnées GELI consiste donc à 
-remplacer la lecture des métadonnées du disque par GELI par celles de LUKS 
-comme illustré par le schéma \ref{fig:transformation_md}. On change donc la 
-fonction {\em luks\_metadata\_softc} pour qu'elle utilise les données extraites
-de l'en tête LUKS du disque au lieu de celles extraites de l'en tête GELI, donc
-respectivement du premier secteur et de quelques secteurs suivant au lieu du 
-dernier secteur. On devra également changer la gestion du déchiffrement de la 
-clé du disque.
+La transformation des métadonnées \textit{LUKS} en métadonnées \textit{GELI}
+consiste donc à remplacer la lecture des métadonnées du disque par \textit{GELI}
+par celles de \textit{LUKS}, comme illustré par le schéma
+\ref{fig:transformation_md}. On change donc la fonction
+\texttt{luks\_metadata\_softc} pour qu'elle utilise les données extraites de
+l'en-tête \textit{LUKS} du disque au lieu de celles extraites de l'en-tête
+\textit{GELI}, donc respectivement du premier secteur et de quelques secteurs
+suivant au lieu du dernier secteur. On devra également changer la gestion du
+déchiffrement de la clé du disque.
 
 
-\subsubsection{Déchiffrement de la clé de chiffrement dans le cas de GELI}
-Dans le cas de GELI, le code prévoit le déchiffrement de la clé de chiffrement 
-dans le noyau, de façon à pouvoir déchiffrer le disque au démarrage (pour 
-pouvoir déchiffrer un volume racine chiffré). Plus précisément l'utilitaire en espace
-utilisateur envoie au noyau via l'API de GEOM, la phrase de passe dérivée via
-l'algorithme PKCS5v2 en prenant SHA512 comme fonction pseudo aléatoire.
+\subsubsection{Déchiffrement de la clé de chiffrement dans le cas de
+  \textit{GELI}}
+Dans le cas de \textit{GELI}, le code prévoit le déchiffrement de la clé de
+chiffrement dans le noyau, de façon à pouvoir déchiffrer le disque au démarrage
+(pour pouvoir déchiffrer un volume racine chiffré). Plus précisément,
+l'utilitaire en espace utilisateur envoie au noyau via l'API de \texttt{GEOM},
+la phrase de passe dérivée via l'algorithme \texttt{PKCS5v2} en prenant SHA512
+comme fonction pseudo aléatoire.
 
 
-\subsubsection{Déchiffrement de la clé de chiffrement dans le cas de LUKS}
+\subsubsection{Déchiffrement de la clé de chiffrement dans le cas de
+  \textit{LUKS}}
 \label{sub:dechif_cle}
 \paragraph{}
-On a donc besoin de déchiffrer la clé de chiffrement stockée dans l'en-tête LUKS.
-Pour cela il faut tout d'abord bien comprendre comment est stockée la clé de 
-chiffrement sur le disque.
+On a donc besoin de déchiffrer la clé de chiffrement stockée dans l'en-tête
+{\em LUKS}. Pour cela il faut tout d'abord bien comprendre comment est stockée
+la clé de chiffrement sur le disque.
 
 \paragraph{}
-La clé de chiffrement est hashée selon l'algorithme spécifié par le champ
+La clé de chiffrement est hachée selon l'algorithme spécifié par le champ
 {\em hash-spec}, et stockée dans le champ {\em mkdigest} (Master Key Digest).
 
-L'en-tête LUKS permet de stocker la même clé chiffrée avec huits phrases de passe
-différentes, dans les huits {\em KeySlot} définis par le standard.
+L'en-tête {\em LUKS} permet de stocker la même clé chiffrée avec huits phrases
+de passe différentes, dans les huits {\em KeySlot} définis par le standard.
 \\
 Pour un keyslot, la phrase de passe est dérivée selon l'aglorithme {\em PKCS5v2}
 avec comme fonction pseudo aléatoire l'algorithme de hashage spécifié par 
 {\em hash-spec}. La clé est ensuite fragmentée via l'algorithme 
 {\em anti-forensic splitter} spécifié dans \cite{AFsplitting} qui a pour but de
 lutter contre la persistance des informations stockées sur des disques durs
-(disques qui utilisent le magnétisme pour stocker les données)
+(disques qui utilisent le magnétisme pour stocker les données).
 \\
 Enfin le résultat de la fragmentation est chiffré selon l'algorithme utilisé 
 pour les données du disque (donc précisé par les champs {\em cipher-name} et 
@@ -160,14 +164,14 @@ passe.
 
 \paragraph{}
 Une différence avec {\em GELI} est que le nombre d'itérations utilisé pour 
-{\em PKCS5v2} est différent pour chaque keyslot alors que pour {\em GELI} c'est
-le même pour toutes les phrases de passe.
-Dans {\em GELI} la phrase de passe est dérivée en espace utilisateur avant 
+{\em PKCS5v2} est différent pour chaque {\em keyslot}, alors que pour {\em GELI}
+c'est le même pour toutes les phrases de passe.
+Dans {\em GELI} la phrase de passe est dérivée en espace utilisateur avant
 d'être envoyée en espace noyau, qui déchiffrera ensuite la clé de chiffrement.
 Or si l'on applique le même procédé pour {\em LUKS}, il faut alors dans le cas
-où les 8 keyslot sont actifs, envoyer 8 phrases de passe dérivées au noyau.
-Il est donc plus simple d'envoyer la phrase de passe directement au noyau, qui
-effectuera donc tout les calculs.
+où les 8 {\em keyslot} sont actifs, envoyer 8 phrases de passe dérivées au
+noyau. Il est donc plus simple d'envoyer la phrase de passe directement au
+noyau, qui effectuera donc tous les calculs.
 
 \subsubsection{Choix concernant la clé de chiffrement}
 \paragraph{}
@@ -176,9 +180,9 @@ On a choisi de transformer les métadonnées de {\em LUKS} en métadonnées
 {\em GELI} pour la clé de chiffrement. En effet, si on voulait écrire la clé 
 de chiffrement dans les métadonnées {\em GELI}, il faudrait déchiffrer la clé 
 présente sous le format {\em LUKS} puis la rechiffrer sous le format {\em GELI}
-pour ensuite la déchiffrer. Ce serait réaliser des opérations en plus, qui ne 
-sont pas nécessaires et il faudrait en plus de cela choisir une phrase de passe
-pour le rechiffrement de la clé au format {\em GELI}. 
+pour ensuite la déchiffrer à nouveau. Ce serait réaliser des opérations en plus,
+qui ne sont pas nécessaires, et il faudrait en plus de cela choisir une phrase
+de passe pour le rechiffrement de la clé au format {\em GELI}. 
 
 \paragraph{}
 La clé de chiffrement étant déjà traitée de façon séparée dans le code de 
@@ -194,25 +198,25 @@ génération du vecteur d'initialisation \textbf{IV}. Dans notre cas, l'algorith
 de chiffrement peut être \textbf{aes-xts}, \textbf{aes-cbc} ou
 \textbf{cast5-cbc}. Chacun de ces algorithmes n'accepte pas les même méthodes de
 génération de l'\textbf{IV}, qui peut être de type \textit{plain} (32 ou 64) ou
-\textit{essiv:sha256}. Bien que le standard proposé par le créateur
-d'\textit{essiv} n'interdise pas l'utilisation d'autres algorithmes de hachage
-(comme le suggère la syntaxe de la commande), seul \texttt{SHA256} peut être
-utilisé avec \textit{essiv} dans \textit{cryptsetup}. Le vecteur
-d'initialisation est unique à chaque secteur du volume chiffré. Il doit donc
-être recalculé pour chaque secteur. Cela permet de ne pas avoir besoin de
-déchiffrer l'intégralité du volume pour accéder à une ressource placée à la fin
-des données chiffrées. Cela permet également de paralléliser les processus gérant
-le chiffrement ou déchiffrement d'un même disque, puisque chaque secteur pourra
-être manié indépendamment des autres. Le premier type prend le numéro du secteur
-concerné codé sur 32 ou 64 bits comme vecteur d'initialisation, tandis que
-\textit{essiv:sha256} (pour \textbf{e}ncrypted \textbf{s}ector-\textbf{s}alt
-\textbf{i}nitialisation \textbf{v}ector) calcule l'IV à partir d'une combinaison
-du numéro de secteur avec le hachage de la clé de chiffrement.
+\textit{essiv:sha256} selon les cas. Bien que le standard proposé par le
+créateur d'\textit{essiv} n'interdise pas l'utilisation d'autres algorithmes de
+hachage (comme le suggère la syntaxe de la commande), seul \texttt{SHA256} peut
+être utilisé avec \textit{essiv} dans \textit{cryptsetup}.
 \paragraph{}
+Le vecteur d'initialisation est unique à chaque secteur du volume chiffré. Il
+doit donc être recalculé pour chaque secteur. Cela permet de ne pas avoir besoin
+de déchiffrer l'intégralité du volume pour accéder à une ressource placée à la
+fin des données chiffrées. Cela permet également de paralléliser les processus
+gérant le chiffrement ou déchiffrement d'un même disque, puisque chaque secteur
+pourra être manié indépendamment des autres. Le premier type prend le numéro du
+secteur concerné codé sur 32 ou 64 bits comme vecteur d'initialisation, tandis
+que \textit{essiv:sha256} (pour \textbf{e}ncrypted \textbf{s}ector-\textbf{s}alt
+\textbf{i}nitialisation \textbf{v}ector) calcule l'\textbf{IV} à partir d'une
+combinaison du numéro de secteur avec le \textit{hash} de la clé de chiffrement.
 \begin{figure}[h]
-\centering
-\includegraphics[width=.9\linewidth]{choix_developpement/aes_cbc.png}
-\caption{\label{fig:aes_cbc}Chiffrement en AES-CBC}
+  \centering
+  \includegraphics[width=.9\linewidth]{choix_developpement/aes_cbc.png}
+  \caption{\label{fig:aes_cbc}Chiffrement en AES-CBC}
 \end{figure}
 \paragraph{}
 Dans les métadonnées \textit{LUKS}, deux champs distincts permettent à
@@ -220,15 +224,16 @@ Dans les métadonnées \textit{LUKS}, deux champs distincts permettent à
 manière dont le vecteur d'initialisation \texttt{IV} est calculé:
 \begin{itemize}
 \item \textbf{Cipher name}: nom de l'algorithme de chiffrement utilisé
-\item \textbf{Cipher mode}: manière dont le vecteur d'initialisation est généré
+\item \textbf{Cipher mode}: nom de la méthode de calcul du vecteur
+  d'initialisation
 \end{itemize}
 \paragraph{}
 Dans les métadonnées \textit{GELI}, ces deux informations sont confondues dans
 le champs \textbf{ealgo} (\textit{encryption algorithm}). La variable est
 ensuite enregistrée et utilisée dans la structure \texttt{softc}. Le calcul de
-\textbf{IV} quant à lui est géré par la fonction \texttt{g\_eli\_crypto\_ivgen},
-qui est en mode \textit{plain64} lorsque l'algorithme \textbf{aes-xts} est
-utilisé, et \textit{essiv:sha256} autrement.
+l'\textbf{IV} quant à lui est géré par la fonction
+\texttt{g\_eli\_crypto\_ivgen}, qui est en mode \textit{plain64} lorsque
+l'algorithme \textbf{aes-xts} est utilisé, et \textit{essiv:sha256} autrement.
 \paragraph{}
 Par défaut, le type d'\textbf{IV} (le \texttt{cipher mode} dans \textit{LUKS})
 calculé par la fonction de \textit{GELI} dépend de l'algorithme de chiffrement
@@ -246,21 +251,23 @@ liste d'algorithmes possibles se restreint aux choix suivants:
 \begin{center}
   \begin{tabular}{ | l | l | }
     \hline
-    \textbf{Cipher name} & \textbf{Cipher mode}  \\
+    \textbf{Cipher name} & \textbf{Cipher mode} \\
     \hline
-    AES-XTS              & \texttt{plain64}      \\
-    AES-CBC              & \texttt{essiv:sha256} \\
-    CAST5-CBC            & \texttt{plain}        \\
+    AES-XTS              & \texttt{plain64} \\
+    AES-CBC              & \texttt{plain} \textbf{OU} \texttt{essiv:sha256} (un
+                           seul) \\
+    CAST5-CBC            & \texttt{plain} \\
     \hline
   \end{tabular}
 \end{center}
 \paragraph{}
-Cependant, \textit{LUKS} ne gérant pas l'authentification des données et
-\textit{GELI} le faisant, il est possible d'utiliser le champs \texttt{aalgo}
-devenu inutile, pour pouvoir stocker le \textit{cipher mode} indépendamment du
-\textit{cipher name}. En faisant cela, seule la fonction chargée du calcul de
-\textbf{IV} doit être modifiée, mais les structures \texttt{metadata} et
-\texttt{softc} héritées de \textit{GELI} restent inchangées.
+Cependant, \textit{LUKS} ne gérant pas l'authentification des données
+contrairement à \textit{GELI}, il est possible d'utiliser le champ
+\texttt{aalgo} devenu inutile, pour pouvoir stocker le \textit{cipher mode}
+indépendamment du \textit{cipher name}. En faisant cela, seule la fonction
+chargée du calcul de \textbf{IV} doit être modifiée, mais les structures
+\texttt{g\_luks\_metadata} et \texttt{g\_luks\_softc} héritées de \textit{GELI}
+restent inchangées.
 \paragraph{}
 Le nombre de choix possibles se limite maintenant aux associations suivantes:
 \begin{center}
@@ -281,7 +288,6 @@ qui doivent à la fois être présents dans le standard \textit{LUKS} et support
 par \textit{FreeBSD}.
 
 
-
 \subsubsection{Champ drapeaux: \texttt{md\_flags}}
 \paragraph{}
 Certains paramètres, indispensables à \textit{GELI} pour manipuler des disques
@@ -291,14 +297,15 @@ par exemple à l'authentification des données, prise en charge par \textit{GELI
 mais pas \textit{LUKS}. D'autres champs décrivent comment sont chiffrées les
 données, en dehors des algorithmes utilisés.
 \paragraph{}
-Ce champ est présent dans les structures \texttt{metadata} et \texttt{softc} de
-\textit{GELI}. Il précise les différentes options possibles pour le chiffrement
-de disques et garanti ainsi la compatibilité entre les différentes versions de
-\textit{GELI}. La version actuelle comprend 16 drapeaux: \\
+Ce champ est présent dans les structures \texttt{g\_eli\_metadata} et
+\texttt{g\_eli\_softc} de \textit{GELI}. Il précise les différentes options
+possibles pour le chiffrement de disques et garanti ainsi la compatibilité entre
+les différentes versions de \textit{GELI}. La version actuelle comprend 16
+drapeaux: \\
 \\
 \begin{tabularx}{\linewidth}{ | l | X | }
   \hline
-  \textbf{Drapeau}                            & \textbf{Description} \\
+  \textbf{Drapeau}                           & \textbf{Description} \\
   \hline
   \texttt{G\_ELI\_FLAG\_ONETIME}             & Utiliser des clés aléatoires et
   uniques \\
@@ -311,12 +318,12 @@ de disques et garanti ainsi la compatibilité entre les différentes versions de
   \texttt{G\_ELI\_FLAG\_AUTH}                & Proposer l'authentification des
   données \\
   \texttt{G\_ELI\_FLAG\_RO}                  & Le volume est en lecture seule,
-  toute tentative d'écriture serait refusée \\
+  toute tentative d'écriture est refusée \\
   \texttt{G\_ELI\_FLAG\_NODELETE}            & Ne pas ignorer les requêtes
   \texttt{BIO\_DELETE} \\
-  \texttt{G\_ELI\_FLAG\_GELIBOOT}           & Cette version de \textit{GELI}
+  \texttt{G\_ELI\_FLAG\_GELIBOOT}            & Cette version de \textit{GELI}
   supporte \textit{GELIBoot} \\
-  \texttt{G\_ELI\_FLAG\_GELIDISPLAYPASS}    & Masquer la longueur de la phrase
+  \texttt{G\_ELI\_FLAG\_GELIDISPLAYPASS}     & Masquer la longueur de la phrase
   de chiffrement dans \textit{GELIboot} \\
   \texttt{G\_ELI\_FLAG\_WOPEN}               & Le volume autorise l'écriture \\
   \texttt{G\_ELI\_FLAG\_DESTROY}             & Détruire le volume \\
@@ -327,8 +334,8 @@ de disques et garanti ainsi la compatibilité entre les différentes versions de
   \texttt{G\_ELI\_FLAG\_SUSPEND}             & Dispositif suspendu \\
   \texttt{G\_ELI\_FLAG\_FIRST\_KEY}          & Le volume utilise la première
   clé de chiffrement \\
-  \texttt{G\_ELI\_FLAG\_ENC\_IVKEY}          & Le volume utilise l'IV-Key pour
-  générer la clé de chiffrement \\
+  \texttt{G\_ELI\_FLAG\_ENC\_IVKEY}          & Le volume utilise
+  l'\textit{IV-Key} pour générer la clé de chiffrement \\
   \hline
 \end{tabularx}
 \paragraph{\texttt{G\_ELI\_FLAG\_BOOT}}
@@ -341,27 +348,23 @@ chiffrée. Il serait donc possible de l'utiliser pour la chiffrer avec
 désactivé pour ignorer les fonctions et les champs normalement utilisés par
 \textit{GELI} pour réaliser cette action. Ce drapeau doit être désactivé.
 \paragraph{\texttt{G\_ELI\_FLAG\_SINGLE\_KEY}}
-Dans la plupart des versions de \textit{GELI}, la clé maître est dérivée pour
-chiffrer chaque secteur. Cependant, \textit{LUKS} ne la dérive pas et utilise la
-même clé pour chiffrer tout le volume. Ce drapeau doit alors être activé, car
-il permet d'indiquer aux fonctions de \textit{GELI} de ne pas dériver la clé
-pour chaque secteur, et ainsi fonctionner comme \textit{LUKS} dans ce cas
-précis.
+Dans la plupart des versions de \textit{GELI}, la clé maître est dérivée tous
+les 2\textasciicircum20. Cependant, \textit{LUKS} ne la dérive pas et utilise la
+même clé pour chiffrer tous les secteurs du volume. Ce drapeau doit alors être
+activé, car il permet d'indiquer aux fonctions de \textit{GELI} de ne pas
+dériver la clé pour chaque secteur, et ainsi fonctionner comme \textit{LUKS}.
 
 \subsubsection{Nombre de clés actives: \texttt{md\_keys}}
 Dans les métadonnées \textit{GELI}, une variable correspond au nombre de clés
 permettant le déchiffrement de la clé maître, et donc du volume chiffré. Dans
 \textit{LUKS}, on peut savoir si l'emplacement d'une clé est actif ou non; il y
 a en tout 8 emplacements. Une boucle permet alors de parcourir tous les
-emplacements et savoir s'ils sont actifs ou non, et ainsi de connaître le nombre
-de phrases secrètes à indiquer dans les métadonnées.
-% LocalWords:  LUKS GELI GEOM keys md KEY FLAG AUTH root BOOT l'IV-Key IVKEY
-% LocalWords:  ENC FIRST ORDER BYTE DESTROY WOPEN GELIboot GLUKSDISPLAYPASS
-% LocalWords:  GELIBoot GLUKSBOOT
+emplacements pour savoir s'ils sont actifs ou non, et ainsi de connaître le
+nombre de phrases secrètes à indiquer dans les métadonnées.
 
 \subsubsection{Création du disque déchiffré}
 Avec {\em GEOM} l'API noyau de FreeBSD pour gérer les disques, lorsque l'on
-créé un disque à partir d'un autre, la structure comprend notamment, la taille
+crée un disque à partir d'un autre, la structure comprend notamment, la taille
 du disque, la taille d'un secteur. Pour calculer la taille du disque, il faut
 soustraire de la taille de la partition complète, la taille de l'en-tête. 
 Avec les métadonnées de {\em LUKS} on a directement le champ {\em payloadoffset}
@@ -386,7 +389,7 @@ Dans un système Linux, \textit{device-mapper} laisse à l'outil qui va l'utilis
 (comme \textit{cryptsetup} qui passe par \textit{dm-crypt, une classe
   \textit{device-mapper}}) la gestion totale des données sur le volume qui lui
 est présenté. Côté FreeBSD en revanche, un outil et une classe \texttt{GEOM}
-doit passer par les fonctions de base de \textit{GEOM}.
+doivent passer par les fonctions de base de \textit{GEOM}.
 
 \subsubsection{Application des fonctions \textit{GELI} à un disque chiffré \textit{LUKS}}
 \paragraph{}
@@ -413,63 +416,63 @@ L'API {\em GEOM} s'utilise donc dans le noyau comme nous l'avons vu mais
 également sous la forme d'une bibliothèque que l'on utilise en espace
 utilisateur permettant de générer automatiquement la sortie de la commande 
 {\em help} pour l'utilitaire par exemple, et bien sur les fonctions permettant
-de changer de contexte en envoyant à la classe GEOM associée des commandes ainsi
-que des valeurs.
+de changer de contexte en envoyant à la classe {\em GEOM} associée des commandes
+ainsi que des valeurs.
 
 \paragraph{}
-Pour générer la sortie de la commande help, ainsi que pour permettre à GEOM de
-vérifier la cohérence des commandes envoyées, la structure {\em g\_command} est
-déclarée dans le code source de l'utilitaire, le développeur n'a ensuite qu'à 
-utiliser les commandes conformément à la structure sans avoir besoin de
-l'utiliser. La structure est utilisée par la bibliothèque pour générér
-automatiquement la commande help et vérifier la cohérence des commandes passées
-au noyau. D'ailleurs concernant les commandes,
-l'utilitaire sert en fait à remplir la structure {\em gctl\_req} à partir des
-entrées utilisateurs, puis de l'envoyer au noyau via la fonction
-{\em gctl\_issue}. Du côté noyau, une fonction permet selon le type de commande
-d'appeler la fonction adéquate avec en argument la structure gctl\_req reçue,
-dont les variables sont utilisées pour accomplir la tâche demandée.
+Pour générer la sortie de la commande help, ainsi que pour permettre à {\em
+  GEOM} de vérifier la cohérence des commandes envoyées, la structure {\em
+  g\_command} est déclarée dans le code source de l'utilitaire, le développeur
+n'a ensuite qu'à utiliser les commandes conformément à la structure sans avoir
+besoin de l'utiliser. La structure est utilisée par la bibliothèque pour générer
+automatiquement la commande {\em help} et vérifier la cohérence des commandes
+passées au noyau. D'ailleurs concernant les commandes, l'utilitaire sert en fait
+à remplir la structure {\em gctl\_req} à partir des entrées utilisateurs, puis
+à l'envoyer au noyau via la fonction {\em gctl\_issue}. Du côté noyau, une
+fonction permet selon le type de commande d'appeler la fonction adéquate avec en
+argument la structure \texttt{gctl\_req} reçue, dont les variables sont
+utilisées pour accomplir la tâche demandée.
 
 \subsection{Compatibilité de l'implémentation}
 \paragraph{}
 Pour implémenter le support de {\em LUKS} sur {\em FreeBSD}, et donc de nouvelles
 fonctions, ainsi que la modification de fonctions existantes de {\em GELI}, il
-faut savoir pour chaque fonction si elle est utilisée dans le noyau ou en espace
-utilisateur ou encore si elle est utilisée dans les deux cas. En effet, on peut
+faut savoir pour chaque fonction, si elle est utilisée dans le noyau ou en espace
+utilisateur, ou encore si elle est utilisée dans les deux cas. En effet, on peut
 par exemple citer l'utilisation de la fonction {\em malloc} qui diffère entre
 le noyau et l'espace utilisateur, on peut également noter que l'utilisation des
 fonctions de chiffrement se fait à travers l'API {\em opencrypto} dans le noyau
 et à travers la bibliothèque {\em OpenSSL} en espace utilisateur. 
 
 \paragraph{}
-Dans l'outil en espace utilisateur permettant d'intéragir avec le module 
-{\em geom\_eli} (dont le fichier source est /sbin/geom/class/eli/geom\_eli.c),
-on peut noter les deux inclusions :
+Dans l'outil en espace utilisateur permettant d'interagir avec le module 
+{\em geom\_eli} (dont le fichier source est
+\texttt{/sbin/geom/class/eli/geom\_eli.c}), on peut noter les deux inclusions:
 \begin{lstlisting}
-#include <geom/eli/g_eli.h>
-#include <geom/eli/pkcs5v2.h>
+  #include <geom/eli/g_eli.h>
+  #include <geom/eli/pkcs5v2.h>
 \end{lstlisting}
 
 \paragraph{}
 Donc les fonctions utilisées directement par l'outil en espace utilisateur sont
 celles dont le prototype ou la définition se trouve dans {\em g\_eli.h} et
 {\em pkcs5v2.h}. On y trouve les structures correspondant aux métadonnées brutes
-comme traitées ({\em g\_eli\_metadata,g\_eli\_softc}) mais aussi les fonctions
-pour décoder et encoder les métadonnées et la fonction qui permet de passer de
-{\em g\_eli\_metadata} à {\em g\_eli\_softc}. Enfin on y trouve les fonctions 
-permettant de chiffrer et déchiffrer la clé maître, avec donc des fonctions
-permettant d'effectuer des opérations de chiffrement et déchiffrement.
-
+comme traitées (\texttt{g\_eli\_metadata}, \texttt{g\_eli\_softc}) mais aussi
+les fonctions pour décoder et encoder les métadonnées et la fonction qui permet
+de passer de \texttt{g\_eli\_metadata} à \texttt{g\_eli\_softc}. Enfin on y
+trouve les fonctions  permettant de chiffrer et déchiffrer la clé maître, avec
+donc des fonctions permettant d'effectuer des opérations de chiffrement et
+déchiffrement.
 
 \paragraph{}
 Si l'on s'intéresse aux objets qui sont assemblés pour produire la bibliothèque
-geom\_luks.o qui est ensuite installée sur le système, on peut noter la présence
-des 4 fichiers suivants :
+\texttt{geom\_luks.o} qui est ensuite installée sur le système, on peut noter la
+présence des 4 fichiers suivants :
 \begin{itemize}
-	\item g\_eli\_crypto.c
-	\item g\_eli\_hmac.c
-	\item g\_eli\_key.c
-	\item pkcs5v2.c
+\item {\em g\_eli\_crypto.c}
+\item {\em g\_eli\_hmac.c}
+\item {\em g\_eli\_key.c}
+\item {\em pkcs5v2.c}
 \end{itemize}
 
 \paragraph{}
@@ -500,7 +503,7 @@ d'utiliser l'algorithme {\em PKCS5v2} avec SHA512 comme dans {\em GELI} mais
 aussi avec {\em SHA1,SHA256,RIPEMD160}. Cela peut être très simple en utilisant
 l'API {\em opencrypto} qui prévoit déjà leur utilisation, cependant conserver
 le modèle de {\em GELI} imposerait l'implémentation de l'algorithme HMAC utilisant
-les autres algorithmes de hashage, et dupliquerait donc du code. Il faudrait
+les autres algorithmes de hachage, et dupliquerait donc du code. Il faudrait
 donc factoriser ou savoir si l'utilisation de {\em PKCS5v2} et du {\em HMAC}
 en espace utilisateur est indispensable. De plus les noms de fonctions qui
 correspondent à l'algorithme SHA1 diffèrent entre le noyau et l'espace
@@ -526,9 +529,9 @@ comme décrit par le schéma \ref{fig:fonctionnement}
 
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=\linewidth]{choix_developpement/utilisation_metadonnee_luks_2.png}
-\caption{\label{fig:fonctionnement}Fonctionnement de GEOM LUKS}
+  \centering
+  \includegraphics[width=\linewidth]{choix_developpement/utilisation_metadonnee_luks_2.png}
+  \caption{\label{fig:fonctionnement}Fonctionnement de GEOM LUKS}
 \end{figure}
 
 \section{Confidentialité}

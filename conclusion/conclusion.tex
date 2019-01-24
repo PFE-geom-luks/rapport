@@ -20,12 +20,12 @@ enlevant le code qui était utile sous {\em GELI} mais ne l'est plus sous
 l'authentification des données sur le disque, ou encore les fonctions s'occupant
 de la dérivation de la clé de chiffrement. Par la suite, on pourrait modifier,
 voire se passer des structures \texttt{g\_luks\_metadata} et
-\texttt{g\_luks\_softc} héritées de {\em GELI} pour n'utiliser que celle de {\em
-  LUKS}. Il faudrait également développer les scripts de tests, probablement en
-adaptant ceux de {\em   GELI}, car l'utilitaire {\em geom\_luks} est très proche
-de {\em geom\_eli}. Enfin il faudrait s'assurer du respect des conventions de
-style de FreeBSD pour le noyau, et faire réaliser une revue de code par les
-développeurs de FreeBSD.
+\texttt{g\_luks\_softc} héritées de {\em GELI} pour n'utiliser que celles de
+{\em GLUKS}. Il faudrait également développer les scripts de tests, probablement
+en adaptant ceux de {\em   GELI}, car l'utilitaire {\em geom\_luks} est très
+proche de {\em geom\_eli}. Enfin il faudrait s'assurer du respect des
+conventions de style de FreeBSD pour le noyau, et faire réaliser une revue de
+code par les développeurs de FreeBSD.
 
 \paragraph{}
 Concernant l'utilitaire, il permet actuellement d'attacher et détacher un volume

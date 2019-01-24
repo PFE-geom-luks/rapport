@@ -8,7 +8,7 @@ utilitaire pour FreeBSD qui permet la lecture et l'écriture sur un volume chiff
 avec le format LUKS1.0. La version 2.0 de LUKS est encore en développement,
 pour arriver à sa version finale, bien que déjà disponible sous Linux. Pour
 pouvoir utiliser la partition au format LUKS sous FreeBSD il faut un système de
-fichier qui soit supporté par les deux systèmes d'exploitation. En listant
+fichiers qui soit supporté par les deux systèmes d'exploitation. En listant
 les systèmes de fichiers disponibles, on peut noter que {\em EXT2, EXT3, openZFS,
 FAT, FAT32, et NTFS} sont disponibles sous Linux et FreeBSD. Le support de {\em
 XFS} a été retiré avec FreeBSD 10 et celui de {\em EXT4} n'existe actuellement
@@ -17,22 +17,22 @@ qu'en lecture seule.
 \subsection{Le démarrage}
 Nous n'avons pas implémenté la partie s'occupant du démarrage sur une partition
 chiffrée avec {\em LUKS}. Cependant pour démarrer sur un système dans lequel le
-{\em /boot} est séparé, il suffirait de peu de modification au code actuel pour
-permettre au noyau, lors de son chargement, d'ouvrir le {\em /} chiffré avec
-LUKS. Le fonctionnement du point de vue de l'utilisateur serait ainsi semblable
-à un système chiffré avec \textit{GELI}.
+{\em /boot} est séparé, il suffirait de peu de modifications du code actuel pour
+permettre au noyau, lors de son chargement, d'ouvrir le \texttt{/} chiffré avec
+{\em LUKS}. Le fonctionnement du point de vue de l'utilisateur serait ainsi
+semblable à un système chiffré avec {\em GELI}.
 
 \subsection{Partage de fichiers et haute disponibilité}
 \paragraph{}
-On peut donc imaginer des cas d'utilisation de LUKS sous FreeBSD permettant par
-exemple de partager des fichiers entre Linux et FreeBSD, et donc de faciliter
-l'installation de dual-boot Linux-FreeBSD. On peut également imaginer disposer
-de systèmes Linux et FreeBSD pour réaliser la même opération sur un stockage
-réseau qui serait chiffré, avec LUKS, permettant d'accroître la disponiblité du
-système en utilisant deux systèmes d'exploitation différents tout en conservant
-la propriété de confidentialité, en permettant uniquement à la machine qui
-utilise le disque de pouvoir le lire (et donc interdisant la machine hébergeant
-le disque de pouvoir lire son contenu).
+On peut donc imaginer des cas d'utilisation de {\em LUKS} sous FreeBSD
+permettant par exemple de partager des fichiers entre Linux et FreeBSD, et donc
+de faciliter l'installation de {\em dual-boot} Linux-FreeBSD. On peut également
+imaginer disposer de systèmes Linux et FreeBSD pour réaliser la même opération
+sur un stockage réseau qui serait chiffré avec {\em LUKS}, permettant
+d'accroître la disponiblité du système en utilisant deux systèmes d'exploitation
+différents tout en conservant la propriété de confidentialité, en permettant
+uniquement à la machine qui utilise le disque de pouvoir le lire (et donc
+interdisant la machine hébergeant le disque de pouvoir lire son contenu).
 \paragraph{}
 Le partage de médias amovibles chiffrés avec \textit{LUKS} est également rendu
 possible entre les deux systèmes. Une simple clé USB ou un disque dur externe

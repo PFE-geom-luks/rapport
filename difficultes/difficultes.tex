@@ -4,39 +4,36 @@
 
 \subsection{Développement noyau}
 
-\paragraph{}Nous avons du implémenter la majorité des fonctions dans le code du
+\paragraph{}Nous avons dû implémenter la majorité des fonctions dans le code du
 module noyau que nous avons créé à partir de {\em GELI}. Il a donc fallu se
-familiariser avec les différences entre noyau et espace utilisateur, on peut
+familiariser avec les différences entre noyau et espace utilisateur. On peut
 par exemple citer l'allocation dynamique ou encore les fonctions de chiffrement
 et de déchiffrement qui diffèrent.
 
 \paragraph{}
 Dans l'espace utilisateur la bibliothèque {\em Openssl} fournit la plupart des
-fonctions de chiffrement et de hashage, tandis que dans le noyau nous avons du
-utiliser l'API {\em Opencrypto}. De même, nous avons du nous familiariser avec
+fonctions de chiffrement et de hashage, tandis que dans le noyau, nous avons dû
+utiliser l'API {\em Opencrypto}. De même, nous avons dû nous familiariser avec
 l'API que propose {\em GEOM} pour comprendre les différents champs des
-structures et fonctions utilisées. Concernant les algorithmes de hashage, l'API
+structures et fonctions utilisées. Concernant les algorithmes de hachage, l'API
 {\em Opencrypto} fourni les fonctions et types pour chaque algorithme, et c'est
 donc au développeur de s'adapter selon l'algorithme à utiliser. Du fait que
-les types pour chaque algorithme de hashage diffèrent (SHA1, SHA256, SHA512),
+les types pour chaque algorithme de hachage diffèrent (SHA1, SHA256, SHA512),
 on est contraint de répéter du code pour chaque algorithme.
 
 \subsection{Débogage}
 \paragraph{}
-L'une des plus grosse difficultés provenait du fait, qu'en mode noyau,
+L'une des plus grosses difficultés provenait du fait que, en mode noyau,
 peu d'erreurs sont permises. Par exemple nous avons souvent du faire face à
 des erreurs de page ou des débordements mémoire qui ne sont alors pas
-rattrapables par le noyau, qui causait alors un plantage du noyau. Nous avons
+rattrapables par le noyau, ce qui causait alors un plantage du noyau. Nous avons
 tout de même pris soin d'activer le débogage noyau dans FreeBSD, ce qui nous
-permettaient de récupérer une image mémoire du noyau que l'on pouvait exploiter
-ultérieurement avec un débogueur noyau.
+permettaient de récupérer une image mémoire de celui-ci, que l'on pouvait
+exploiter ultérieurement avec un débogueur noyau.
 
-\paragraph{}Dans les cas où il n'y avait pas de plantage, l'utilisation de
-{\em printf} nous permettait de déboguer le programme en affichant la valeur
-de certaines variables, qui apparaissaient alors dans les messages envoyées par
-le noyau, que l'on peut consulter avec la commande {\em dmesg} sous la majorité
-des systèmes UNIX dont FreeBSD.
-
-
-
-
+\paragraph{}
+Dans les cas où il n'y avait pas de plantage, l'utilisation de \texttt{printf}
+nous permettait de déboguer le programme en affichant la valeur de certaines
+variables, qui apparaissaient alors dans les messages envoyés par le noyau, que
+l'on peut consulter avec la commande {\em dmesg} sous la majorité des systèmes
+UNIX dont FreeBSD.
