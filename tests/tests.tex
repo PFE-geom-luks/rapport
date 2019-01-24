@@ -16,17 +16,18 @@ en commun.
 \paragraph{}
 Le système Linux utilisé peut être n'importe quelle distribution, tant qu'il est
 possible d'y gérer des disques chiffrés avec le standard \textit{LUKS 1}. Pour
-cela, il est nécessaire que \texttt{cryptsetup} soit installé. La machine ne
-servira ensuite plus qu'à créer les volumes chiffrés avec différents algorithmes
-afin de tester leur déchiffrement depuis FreeBSD.
+cela, il est nécessaire que \texttt{cryptsetup} soit installé. La machines
+ervira ensuite à créer les volumes chiffrés avec différents algorithmes afin de
+tester leur déchiffrement depuis FreeBSD, puis à vérifier leur contenu après y
+avoir écrit des données depuis FreeBSD.
 \subsubsection{FreeBSD}
 \paragraph{}
 Nous nous sommes basé sur la dernière version stable de FreeBSD à ce jour, à
 savoir la version \textit{11.2-RELEASE}. Il est directement possible d'y
 compiler un nouveau noyau ainsi que ses utilitaires à partir du code source.
 \paragraph{}
-Pour compiler le noyau depuis les sources, il suffit de se placer à la racine
-des dossiers du code source et de lancer la commande suivante:
+Pour compiler le noyau, il suffit de se placer à la racine des dossiers
+contenant le code source et de lancer la commande suivante:
 \\
 \begin{lstlisting}[language=bash]
   # FreeBSD
@@ -35,9 +36,9 @@ des dossiers du code source et de lancer la commande suivante:
   shutdown -r now # redémarre le système
 \end{lstlisting}
 \paragraph{}
-Pour simplement mettre à jour le module \texttt{geom\_luks}, il suffit cependant
-de compiler et installer celui-ci, sans devoir recompiler tout le noyau à chaque
-fois.
+Pour simplement mettre à jour le module \texttt{geom\_luks}, il suffit
+simplement de compiler et installer celui-ci, sans devoir recompiler tout le
+noyau.
 \\
 \begin{lstlisting}[language=bash]
   # FreeBSD
@@ -45,7 +46,7 @@ fois.
   # décharge le module sans devoir redémarrer le système
   kldunload geom_luks
 
-  cd $RACINE/sys/modules/geom/geom_luks
+  cd sys/modules/geom/geom_luks
   make
   make install
 \end{lstlisting}
@@ -56,7 +57,7 @@ l'outil associé, ce dernier doit être compilé et installé.
 \begin{lstlisting}[language=bash]
   # FreeBSD
 
-  cd $RACINE/sbin/geom/class/luks
+  cd sbin/geom/class/luks
   make
   make install
 \end{lstlisting}
@@ -65,8 +66,8 @@ l'outil associé, ce dernier doit être compilé et installé.
 \subsection{Création des partions chiffrées}
 \paragraph{}
 Les partitions chiffrées sont créées depuis le système Linux sur un disque
-séparé et enregistré en tant qu'image disque virtuelle. Les partitions créées
-sont:
+séparé, qui est ensuite enregistré en tant qu'image disque virtuelle. Les
+partitions créées sont:
 \begin{itemize}
 \item une partition chiffrée \texttt{aes-xts-plain64}
 \item une partition chiffrée \texttt{aes-cbc-plain}
@@ -91,7 +92,7 @@ Linux sont:
 \paragraph{}
 Il est ensuite possible de déchiffrer les partitions pour les formater et y
 écrire des données. Cela permettra de vérifier par la suite que notre
-implémentation de \textit{LUKS} sur FreeBSD est bien capable de le lire.
+implémentation de \textit{GLUKS} sur FreeBSD est bien capable de le lire.
 \\
 \begin{lstlisting}[language=bash]
   # Linux
@@ -108,8 +109,8 @@ implémentation de \textit{LUKS} sur FreeBSD est bien capable de le lire.
 \end{lstlisting}
 \paragraph{}
 Une fois les partitions chiffrées créées sur un disque, on peut l'ajouter à la
-machine fonctionnant sous FreeBSD, qui pourra ainsi directement interagir
-directement avec lui.
+machine fonctionnant sous FreeBSD, qui pourra ainsi interagir directement avec
+lui.
 \paragraph{}
 Pour plus de simplicité mais des tests équivalents, il est également possible
 d'utiliser des fichiers et d'y héberger les systèmes chiffrés. Cette opération
@@ -144,7 +145,7 @@ l'emplacement du volume à monter dans \texttt{/mnt/}; figure
   \includegraphics[width=\linewidth]{tests/linux_partitions.png}
   \caption{\label{fig:linux_partitions}Création des partitions}
 \end{figure}
-Dans le cas où on utilise d'un fichier qu'on aurait copié dans le répertoire
+Dans le cas où on utilise un fichier qu'on aurait copié dans le répertoire
 courant, il faut d'abord l'attacher en tant que disque avec l'outil
 \texttt{mdconfig}.
 \\
@@ -229,10 +230,10 @@ de la fonction s'occupant de l'attachement.
 Sous FreeBSD, l'attachement de volume avec \textit{GELI} consiste en son
 déchiffrement et le fait de le rendre disponible au montage. Une fois déchiffré,
 un fichier ayant pour extension \texttt{.eli} (ou \texttt{.luks} dans notre
-outil) est créé: c'est lui qui pourra ensuite être monté comme n'importe-quel
-autre volume non chiffré. Sur un système Linux, ce fichier correspond à celui
-créé dans \texttt{/dev/mapper/} grâce à \texttt{cryptsetup luksOpen}. Cette
-opération est donc ignorée pour l'instant.
+implémentation) est créé: c'est lui qui pourra ensuite être monté comme
+n'importe-quel autre volume non chiffré. Sur un système Linux, ce fichier
+correspond à celui créé dans \texttt{/dev/mapper/} grâce à \texttt{cryptsetup
+  luksOpen}. Cette opération est donc ignorée pour l'instant.
 \paragraph{}
 Les fonctions réalisant le déchiffrement de la clé maître à partir d'une phrase
 secrète permettent de savoir si celle-ci est correcte où non. Il est donc
@@ -256,8 +257,7 @@ n'arrivant pas à déchiffrer la clé maître à partir de cette phrase, il n'a 
 pas attaché le volume.
 \paragraph{}
 Dans le second cas, la phrase entrée était correcte. Le système a donc pu
-déchiffrer la clé maître et a attaché le volume, en créant un fichier
-d'extension \texttt{.luks}.
+déchiffrer la clé maître et a attaché le volume.
 
 \subsection{Montage et lecture de données}
 \paragraph{}
@@ -350,9 +350,8 @@ ouvrant le disque avec \texttt{cryptsetup} puis en le montant.
 Dans le stardard \textit{LUKS} comme dans \textit{GELI}, il est possible de
 déchiffrer une partition avec différentes phrases secrètes. Cela est réalisé dans
 \textit{LUKS} en utilisant 8 \texttt{slots} prévus à cet effet, chacun
-correspondant à une phrase.
-Pour ajouter et enlever une phrase de déchiffrement à un disque, on utilise les
-commandes suivantes:
+correspondant à une phrase. Pour ajouter et enlever une phrase de déchiffrement
+à un disque, on utilise les commandes suivantes:
 \\
 \begin{lstlisting}[language=bash]
   # Linux
@@ -371,4 +370,4 @@ sont pas consécutifs.
 \end{figure}
 \paragraph{}
 Afin de tester que le déchiffrement se fait correctement pour chaque phrase
-secrète, on reproduit les tests précédents pour chacune d'entre-elles.
+secrète, on reproduit les tests précédents pour chacune d'elles.
