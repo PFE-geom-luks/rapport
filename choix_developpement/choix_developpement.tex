@@ -6,12 +6,6 @@ source de GELI}
 \label{ssec:md_usage}
 L'analyse de \textit{LUKS} et \textit{GELI} nous a montré les similitudes et
 différences que présentent ces deux systèmes.
-\paragraph{}
-\begin{figure}[h]
-\centering
-\includegraphics[width=.6\linewidth]{choix_developpement/utilisation_metadonnee.png}
-\caption{\label{fig:softc_eli}Métadonnées en mémoire}
-\end{figure}
 
 \paragraph{}
 Pour n'importe-quel module noyau utilisant la classe \textit{GEOM} de
@@ -53,6 +47,13 @@ disque, mais aussi par des informations sur le disque comme sa taille ou encore
 la taille des secteurs. Enfin les clés de chiffrement qui sont dérivées à partir
 de la clé maître y sont également stockées sous la forme d'un arbre et d'une 
 queue.
+
+\paragraph{}
+\begin{figure}[h]
+\centering
+\includegraphics[width=.6\linewidth]{choix_developpement/utilisation_metadonnee.png}
+\caption{\label{fig:softc_eli}Métadonnées en mémoire}
+\end{figure}
 
 \subsection{Transformation des métadonnées de LUKS en métadonnées GELI}
 \subsubsection{Principe général}
@@ -106,7 +107,6 @@ de la lecture sur disque des métadonnées et de leur vérification ainsi que le
 changement des métadonnées sur le disque (changement de la phrase de passe et
 donc de la clé chiffrée sur le disque).
 
-\paragraph{}
 \begin{figure}[h]
 \centering
 \includegraphics[width=.9\linewidth]{choix_developpement/utilisation_metadonnee_luks.png}
@@ -183,7 +183,7 @@ pour le rechiffrement de la clé au format {\em GELI}.
 \paragraph{}
 La clé de chiffrement étant déjà traitée de façon séparée dans le code de 
 {\em GELI}, on choisit de traiter la clé de façon séparée également et donc de 
-ne pas la transformer au format {\em GELI}
+ne pas la transformer au format {\em GELI}.
 
 
 \subsubsection{Sélection des algorithmes utilisés}
@@ -201,9 +201,9 @@ utilisé avec \textit{essiv} dans \textit{cryptsetup}. Le vecteur
 d'initialisation est unique à chaque secteur du volume chiffré. Il doit donc
 être recalculé pour chaque secteur. Cela permet de ne pas avoir besoin de
 déchiffrer l'intégralité du volume pour accéder à une ressource placée à la fin
-des données chiffrées. Cela permet également paralléliser les processus gérant
+des données chiffrées. Cela permet également de paralléliser les processus gérant
 le chiffrement ou déchiffrement d'un même disque, puisque chaque secteur pourra
-être manié indépendamment des autres. Le premier type prend numéro du secteur
+être manié indépendamment des autres. Le premier type prend le numéro du secteur
 concerné codé sur 32 ou 64 bits comme vecteur d'initialisation, tandis que
 \textit{essiv:sha256} (pour \textbf{e}ncrypted \textbf{s}ector-\textbf{s}alt
 \textbf{i}nitialisation \textbf{v}ector) calcule l'IV à partir d'une combinaison
@@ -232,7 +232,7 @@ utilisé, et \textit{essiv:sha256} autrement.
 \paragraph{}
 Par défaut, le type d'\textbf{IV} (le \texttt{cipher mode} dans \textit{LUKS})
 calculé par la fonction de \textit{GELI} dépend de l'algorithme de chiffrement
-(le \textit{cipher name} dans \textit{LUKS}). Cette y association est codée en
+(le \textit{cipher name} dans \textit{LUKS}). Cette association y est codée en
 dur:
 \begin{itemize}
 \item le calcul de l'\textbf{IV} est équivalent au mode \texttt{plain64} de
@@ -348,7 +348,7 @@ d'une clé dérivée à partir d'une phrase de passe à travers le standard
 \paragraph{}
 Dans l'implémentation du module {\em geom\_luks} on doit pouvoir être capable
 d'utiliser l'algorithme {\em PKCS5v2} avec SHA512 comme dans {\em GELI} mais
-aussi avec {\em SHA1,SHA256,RIPEMD160}. Cela peut-être très simple en utilisant
+aussi avec {\em SHA1,SHA256,RIPEMD160}. Cela peut être très simple en utilisant
 l'API {\em opencrypto} qui prévoit déjà leur utilisation, cependant conserver
 le modèle de {\em GELI} imposerait l'implémentation de l'algorithme HMAC utilisant
 les autres algorithmes de hashage, et dupliquerait donc du code. Il faudrait
@@ -388,7 +388,7 @@ Certains paramètres, indispensables à \textit{GELI} pour manipuler des disques
 chiffrés, n'ont pas d'équivalents dans les métadonnées \textit{LUKS} et ne
 peuvent donc pas être traduits d'un standard à l'autre. Il peuvent correspondre
 par exemple à l'authentification des données, prise en charge par \textit{GELI}
-mais pas \textit{LUKS}. D'autres champs décrivant comment sont chiffrées les
+mais pas \textit{LUKS}. D'autres champs décrivent comment sont chiffrées les
 données, en dehors des algorithmes utilisés.
 \paragraph{}
 Ce champ est présent dans les structures \texttt{metadata} et \texttt{softc} de
@@ -421,7 +421,7 @@ de disques et garanti ainsi la compatibilité entre les différentes versions de
   \texttt{G\_ELI\_FLAG\_WOPEN}               & Le volume autorise l'écriture \\
   \texttt{G\_ELI\_FLAG\_DESTROY}             & Détruire le volume \\
   \texttt{G\_ELI\_FLAG\_NATIVE\_BYTE\_ORDER} & Le volume utilise l'ordre natif
-  d'octets pour la générer du vecteur d'initialisation \\
+  d'octets pour générer les vecteurs d'initialisations \\
   \texttt{G\_ELI\_FLAG\_SINGLE\_KEY}         & Le volume utilise une seule clé
   de chiffrement \\
   \texttt{G\_ELI\_FLAG\_SUSPEND}             & Dispositif suspendu \\
@@ -463,7 +463,7 @@ de phrases secrètes à indiquer dans les métadonnées.
 Avec {\em GEOM} l'API noyau de FreeBSD pour gérer les disques, lorsque l'on
 créé un disque à partir d'un autre, la structure comprend notamment, la taille
 du disque, la taille d'un secteur. Pour calculer la taille du disque, il faut
-soustraire de la taille du de la partition complète, la taille de l'en-tête. 
+soustraire de la taille de la partition complète, la taille de l'en-tête. 
 Avec les métadonnées de {\em LUKS} on a directement le champ {\em payloadoffset}
 qui permet de connaître le nombre de secteurs qu'occupent l'en-tête. Comme sous
 {\em GELI} les métadonnées sont à la fin du disque, il n'y a pas de
@@ -490,7 +490,7 @@ doit passer par les fonctions de base de \textit{GEOM}.
 
 \subsubsection{Application des fonctions \textit{GELI} à un disque chiffré \textit{LUKS}}
 \paragraph{}
-Dans notre cas, on appelle l'outil l'ensemble des commandes qui entrées par
+Dans notre cas, on appelle l'outil l'ensemble des commandes qui sont entrées par
 l'utilisateur afin de gérer le disque chiffré. Par défaut, l'outil \textit{GELI}
 appelle une fonction de \textit{GEOM} qui va chercher les métadonnées sur le
 volume pour les enregistrer dans une structure passée en paramètre. Cependant,
@@ -500,16 +500,6 @@ structure. Pour développer notre outil \textit{GLUKS} avec un fonctionnement
 semblable à celui de \textit{GELI}, il est nécessaire d'écrire une fonction
 similaire ayant pour vocation d'aller chercher ces métadonnées au début du
 disque plutôt qu'à la fin.
-\paragraph{}
-La classe \textit{GEOM} est l'ensemble des fonctions permettant la gestion de
-disque côté noyau. Pour la lecture et l'écriture des métadonnées, les fonctions
-de la classe \textit{GELI} ne dépendent pas de fonctions \textit{GEOM} de base.
-Elles cherchent toujours l'emplacement des métadonnées à la fin du volume mais
-calcule cette fois-ci elle-même l'\texttt{offset} à partir duquel elles se
-trouvent. Afin d'adapter la classe \textit{GELI} à notre classe \textit{GLUKS},
-il est nécessaire de mettre cet \texttt{offset} à \texttt{0} à chaque fois qu'on
-aura à lire ou écrire des données sur le disque, qu'il s'agisse de métadonnées
-ou de données utiles. 
 
 \section{Passage de l'espace utilisateur au noyau}
 Nous avions donc besoin d'envoyer au noyau la phrase de passe, pour cela il a
@@ -533,18 +523,18 @@ déclarée dans le code source de l'utilitaire, le développeur n'a ensuite qu'�
 utiliser les commandes conformément à la structure sans avoir besoin de
 l'utiliser. La structure est utilisée par la bibliothèque pour générér
 automatiquement la commande help et vérifier la cohérence des commandes passées
-au noyau. D'ailleurs concernant commandes,
+au noyau. D'ailleurs concernant les commandes,
 l'utilitaire sert en fait à remplir la structure {\em gctl\_req} à partir des
 entrées utilisateurs, puis de l'envoyer au noyau via la fonction
 {\em gctl\_issue}. Du côté noyau, une fonction permet selon le type de commande
 d'appeler la fonction adéquate avec en argument la structure gctl\_req reçue,
-dont les variables sont utilisée pour accomplir la tâche demandée.
+dont les variables sont utilisées pour accomplir la tâche demandée.
 
 \section{Confidentialité}
 \paragraph{}
 Comme nous l'avons constaté en utilisant le code de {\em GELI}, les variables
 qui contiennent des données qui pourraient porter atteinte à la confidentialité
-sont écrasée avec des zéros dès qu'elles ne sont plus utiles, y compris avant
+sont écrasées avec des zéros dès qu'elles ne sont plus utiles, y compris avant
 le retour de la fonction. Cela permet de rendre les attaques sur le module
 noyau ou la mémoire vive plus complexe, pour obtenir la clé de déchiffrement ou
 la phrase de passe du disque. En effet, on utilise l'instruction {\em bzero}

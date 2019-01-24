@@ -83,8 +83,8 @@ chiffré et les métadonnées restent en clair. C'est le type de chiffrement
 utilisé par des archives comme \textit{7z}. Le chiffrement peut également se
 faire directement sur un fichier, en utilisant des algorithmes standards de 
 chiffrement comme AES ou RSA, via des solutions logicielles comme
-\textit{gpg}, le fichier ainsi créé par chiffrement est agnostique du format 
-du fichier en clair.
+\textit{gpg}, le fichier ainsi créé par chiffrement ne reflète aucunement
+le format du fichier en clair.
 
 
 \section{Chiffrement de disque sur Linux et FreeBSD}
@@ -108,7 +108,7 @@ Le module permettant de manipuler un disque chiffré sous Linux se nomme
 Le standard qui est actuellement le plus utilisé pour le chiffrement de disque
 est \textit{LUKS} (\textit{Linux Unified Key Setup}\cite{onDiskFormatLuks}). Son
 rôle est de chiffrer intégralement un volume tout en le rendant utilisable par
-d'autres plate-formes.
+d'autres plateformes.
 \paragraph{FreeBSD}
 Le module permettant cette opération sous FreeBSD se nomme \textit{GELI},
 remplaçant l'ancien module \textit{GBDE}. Il appartient à la classe
@@ -142,13 +142,13 @@ donc la suivante :
 \end{figure}
 
 \paragraph{}
-L'organisation reflétée par les programmes l'est également au niveau du code,
-le module {\em dm-crypt} est agnostique de l'existance de métadonnées ainsi 
+L'organisation reflétée par les programmes l'est également au niveau du code source,
+le module {\em dm-crypt} est n'a pas connaissance de l'existance de métadonnées ainsi 
 que de leur format. On a donc le module {\em device-mapper \em et \em dm-crypt}
 qui font partie du code du noyau {\em Linux}, tandis que {\em Crypsetup} est un 
 programme qui est usuellement fourni avec {\em Linux} en tant qu'utilitaire, 
 qui est géré par une équipe indépendante de celle du noyau {\em Linux}. De plus 
-{\em dm-crypt} est agnostique des algorithmes de chiffrement disponibles,
+{\em dm-crypt} est n'a pas connaissance des algorithmes de chiffrement disponibles,
 le module s'appuie sur l'API de cryptographie du noyau.
 
 \paragraph{}
@@ -160,14 +160,14 @@ Ces modules sont appelés {\em Classes GEOM},
 celle qui fournit le chiffrement est nommée {\em ELI}, le module noyau associé 
 est ainsi appelé {\em GELI}. Le module contrairement à {\em dm-crypt}, 
 comprend toute la logique des métadonnées, ainsi que des algorithmes de 
-chiffrement disponibles. L'outil en espace utilisateur tire son code
-directement du code du module {\em geli}. {\em GELI} profite de la 
+chiffrement disponibles. L'outil en espace utilisateur tire son code source
+directement des sources du module {\em geli}. {\em GELI} profite de la 
 connaissance du format des métadonnées pour directement détecter les 
 partitions chiffrées, et donc proposer leur déchiffrement à l'utilisateur, 
 là où {\em Linux} ne peut pas détecter de
 partition ou disque chiffré, et c'est à l'utilisateur de préciser qu'il veut 
 déchiffrer tel disque avec l'outil {\em crypsetup} qui va donc reconnaître le 
-format. On a donc l'organisation suivante :
+format. On a donc l'organisation suivante sous FreeBSD:
 
 
 \paragraph{}
@@ -186,7 +186,7 @@ informations permettant de déchiffrer une autre partie du disque.
 Comme le noyau {\em Linux} ne contient pas de format de métadonnées, 
 c'est {\em Crypsetup} qui a choisi de créer un format appelé {\em Linux 
 Unified Key Setup ({\em LUKS})}, comme format standard pour le chiffrement de 
-disque sous {\em Linux}. En effet, {\em Crypsetup} implémente d'autres format 
+disque sous {\em Linux}. En effet, {\em Crypsetup} implémente d'autres formats 
 de métadonnées comme {\em TrueCrypt} développé par la 
 {\em TrueCrypt Fondation}. 
 Le format {\em LUKS} consiste en des métadonnées au début de la partition, 
@@ -246,7 +246,7 @@ Les algorithmes de chiffrement disponibles pour {\em GELI} \cite{geli.h} sont :
 \end{itemize}
 
 Cependant {\em GELI} profite des fonctions de chiffrement grâce à l'API noyau,
-opencrypto, qui permet donc également d'utiliser les algorithmes suivants:
+opencrypto, qui permettrait donc également d'utiliser les algorithmes suivants:
 \begin{itemize}
 	\item{CAST5-CBC}
 	\item{SKIPJACK-CBC}
@@ -367,7 +367,7 @@ le démarrage sur ce système est possible.
 \paragraph{}
 On propose de rappeler la séquence de démarrage pour la suite.
 \\
-Le BIOS est le premier programme qui démarre et permet de lancer le bootloader, 
+Le BIOS est le premier programme qui démarre et permet de lancer le chargeur d'amorçage, 
 qui se charge de lancer le système, en lançant l'inital ramdisk, qui est un noyau
 allégé, permettant de préparer notamment le disque lorsqu'il utilise LVM, du 
 RAID, ou encore du chiffrement. Le noyau contient le minimum et les modules
@@ -403,16 +403,16 @@ une contenant le {\em /} et une autre le {\em /boot}.
 \paragraph{}
 Sous Linux, dans le cas d'un {\em /boot} séparé, le système démarre normalement,
 puis lorsque le l'Initrd est chargé, il charge les modules et lance les scripts
-(nommés hook) nécessaires pour démarrer, dont ceux permettant de monter la
+(nommés hooks) nécessaires pour démarrer, dont ceux permettant de monter la
 racine. Un script est dédié au déchiffrement des disques, son nom et son chemin
 dans le système de fichier varie selon les distributions. Le script est donc
 lancé et permet de déchiffrer la partition chiffrée et donc le démarrage
 peut continuer normalement.
 
 \paragraph{}
-Dans le cas où le {\em /boot} est chiffré, c'est le rôle des premieres parties
-du bootloader de déchiffrer le disque pour pouvoir charger l'Initrd. Parmi les
-bootloader supportés par Linux on peut citer GRUB2 et LILO
+Dans le cas où le {\em /boot} est chiffré, c'est le rôle des premières parties
+du chargeur d'amorçage de déchiffrer le disque pour pouvoir charger l'Initrd. Parmi les
+chargeurs d'amorçage supportés par Linux on peut citer GRUB2 et LILO
 (qui n'est plus maintenu) qui supportent le déchiffrement de partition chiffrée
 avec LUKS.
 
@@ -443,13 +443,13 @@ de type {\em GELI} et va alors proposer de les déchiffrer. Cette étape est
 \paragraph{}
 Dans le cas d'une seule partition contenant le {\em /} et le {\em /boot}, comme
 la chaîne de démarrage comprend plusieurs étapes, c'est d'abord à {\em boot2}
-(la dernière étape du bootloader) de déchiffrer le disque pour charger le loader
+(la dernière étape du chargeur d'amorçage) de déchiffrer le disque pour charger le chargeur
 de FreeBSD, qui va alors avoir besoin de déchiffrer le disque pour pouvoir
 utiliser les noyaux disponibles notamment. Enfin dans le noyau, le module
 {\em geom\_eli} va permettre de déchiffrer la partition contenant la racine.
 Pour éviter d'avoir à taper la phrase de passe plusieurs fois, la phrase de
 passe est passée via des zones mémoires partagées aux différents parties :
-{\em boot2} donne la phrase de passe au {\em loader} qui la donne au noyau.
+{\em boot2} donne la phrase de passe au {\em chargeur} qui la donne au noyau.
 
 
 \paragraph{}
