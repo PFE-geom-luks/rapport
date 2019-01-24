@@ -226,10 +226,21 @@ bon déchiffrement du disque en tant que tel.
 On reprend la fonction précédente pour y ajouter cette fois-ci la partie
 responsable de l'attachement du volume chiffré. Après s'être assuré qu'un
 fichier en \texttt{.luks} est bien créé dans \texttt{/dev/}, son montage dans
-l'arborescence peut se faire. Cette action est réalisée via la commande
-\texttt{mount -t ext2fs /dev/ada1p1.luks /mnt}. On peut ensuite s'assurer de son
-contenu, en vérifiant par exemple celui d'un fichier texte qu'on aurait créé
-sous Linux.
+l'arborescence peut se faire. On peut ensuite s'assurer de son contenu, en
+vérifiant par exemple celui d'un fichier texte qui a été créé sous Linux.
+\\
+\begin{lstlisting}[language=bash]
+  # FreeBSD
+
+  gluks test_passphrase /dev/ada1p1
+  mount -t ext2fs /dev/ada1p1.luks /mnt
+  
+  cat /mnt/file.txt # ecrit "geom_luks: aes-xts-plain64" sur la sortie standard
+
+  unmount /mnt
+  gluks detach /dev/ada1p1
+\end{lstlisting}
+% TODO: figure cat
 
 \subsection{Montage et écriture de données}
 \paragraph{}
@@ -238,3 +249,38 @@ des données. On peut par exemple y placer un fichier contenant du texte.
 \paragraph{}
 Il est ensuite possible de vérifier son contenu depuis notre machine Linux, en
 ouvrant le disque avec \texttt{cryptsetup} puis en le montant.
+\\
+\begin{lstlisting}[language=bash]
+  # FreeBSD
+
+  gluks test_passphrase /dev/ada1p1
+  mount -t ext2fs /dev/ada1p1.luks /mnt
+  
+  cat /mnt/file.txt # ecrit "geom_luks: aes-xts-plain64" sur la sortie standard
+
+  unmount /mnt
+  gluks detach /dev/ada1p1
+\end{lstlisting}
+% TODO: figure echo in FreeBSD, cat in Linux
+
+\subsection{Déchiffrement de disque avec différentes phrases secrètes}
+\paragraph{}
+Dans le stardard \textit{LUKS} comme dans \textit{GELI}, il est possible de
+déchiffré une partition avec différentes phrases secrètes. Cela est réalisé dans
+\textit{LUKS} en utilisant 8 \texttt{slots} prévus à cet effet, chacun
+correspondant à une phrase.
+Pour ajouter et enlever une phrase de déchiffrement à un disque, on utilise les
+commandes suivantes:
+\\
+\begin{lstlisting}[language=bash]
+  # Linux
+
+  cryptsetup luksAddKey /dev/sdb1
+  cryptsetup luksRemoveKey /dev/sdb1
+\end{lstlisting}
+Il est ainsi possible de retrouver dans des cas où les \texttt{slots} actifs ne
+sont pas consécutifs.
+% TODO: figure medatata 2 passphrases
+\paragraph{}
+Afin de tester que le déchiffrement se fait correctement pour chaque phrase
+secrète, on reproduit les tests précédents pour chacune d'entre-elles.
