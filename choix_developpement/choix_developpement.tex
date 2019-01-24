@@ -281,106 +281,6 @@ qui doivent à la fois être présents dans le standard \textit{LUKS} et support
 par \textit{FreeBSD}.
 
 
-\subsubsection{Noyau et espace utilisateur}
-\paragraph{}
-Pour implémenter le support de {\em LUKS} sur {\em FreeBSD}, et donc de nouvelles
-fonctions, ainsi que la modification de fonctions existantes de {\em GELI}, il
-faut savoir pour chaque fonction si elle est utilisée dans le noyau ou en espace
-utilisateur ou encore si elle est utilisée dans les deux cas. En effet, on peut
-par exemple citer l'utilisation de la fonction {\em malloc} qui diffère entre
-le noyau et l'espace utilisateur, on peut également noter que l'utilisation des
-fonctions de chiffrement se fait à travers l'API {\em opencrypto} dans le noyau
-et à travers la bibliothèque {\em OpenSSL} en espace utilisateur. 
-
-\paragraph{}
-Dans l'outil en espace utilisateur permettant d'intéragir avec le module 
-{\em geom\_eli} (dont le fichier source est /sbin/geom/class/eli/geom\_eli.c),
-on peut noter les deux inclusions :
-\begin{lstlisting}
-#include <geom/eli/g_eli.h>
-#include <geom/eli/pkcs5v2.h>
-\end{lstlisting}
-
-\paragraph{}
-Donc les fonctions utilisées directement par l'outil en espace utilisateur sont
-celles dont le prototype ou la définition se trouve dans {\em g\_eli.h} et
-{\em pkcs5v2.h}. On y trouve les structures correspondant aux métadonnées brutes
-comme traitées ({\em g\_eli\_metadata,g\_eli\_softc}) mais aussi les fonctions
-pour décoder et encoder les métadonnées et la fonction qui permet de passer de
-{\em g\_eli\_metadata} à {\em g\_eli\_softc}. Enfin on y trouve les fonctions 
-permettant de chiffrer et déchiffrer la clé maître, avec donc des fonctions
-permettant d'effectuer des opérations de chiffrement et déchiffrement.
-
-
-\paragraph{}
-Si l'on s'intéresse aux objets qui sont assemblés pour produire la bibliothèque
-geom\_luks.o qui est ensuite installée sur le système, on peut noter la présence
-des 4 fichiers suivants :
-\begin{itemize}
-	\item g\_eli\_crypto.c
-	\item g\_eli\_hmac.c
-	\item g\_eli\_key.c
-	\item pkcs5v2.c
-\end{itemize}
-
-\paragraph{}
-Le fichier {\em g\_eli\_crypto.c} contient les fonctions permettant de réaliser
-du chiffrement et déchiffrement qui sont donc implémentées deux fois (une fois
-pour le noyau, une autre pour l'espace utilisateur). Le fichier
-{\em g\_eli\_hmac.c} contient quand à lui une implémentation des fonctions
-permettant de calculer des HMAC avec l'algorithme SHA512. Une seule implémentation
-est présente, elle est compatible entre le noyau et l'espace utilisateur, du fait
-que les fonctions et types associés à SHA512 sont les mêmes entre le noyau et
-l'espace utilisateur.
-Cependant l'API {\em opencrypto} implémente déjà l'algorithme de HMAC avec SHA512.
-La réimplémentation de l'algorithme permettant le calcul d'un HMAC peut très
-probablement s'expliquer du fait qu'elle permet d'avoir un code plus restreint,
-et donc plus facilement maintenable.
-
-Le fichier {\em g\_eli\_key.c} contient quant à lui les fonctions permettant de
-chiffrer, déchiffrer et vérifier la clé maître, en utilisant les fonctions de
-{\em g\_eli\_crypto.c}.
-
-Enfin le fichier {\em pkcs5v2.c} contient les fonctions permettant le calcul
-d'une clé dérivée à partir d'une phrase de passe à travers le standard
-{\em PKCS5v2}, en utilisant les fonctions de {\em g\_eli\_hmac.c}.
-
-\paragraph{}
-Dans l'implémentation du module {\em geom\_luks} on doit pouvoir être capable
-d'utiliser l'algorithme {\em PKCS5v2} avec SHA512 comme dans {\em GELI} mais
-aussi avec {\em SHA1,SHA256,RIPEMD160}. Cela peut être très simple en utilisant
-l'API {\em opencrypto} qui prévoit déjà leur utilisation, cependant conserver
-le modèle de {\em GELI} imposerait l'implémentation de l'algorithme HMAC utilisant
-les autres algorithmes de hashage, et dupliquerait donc du code. Il faudrait
-donc factoriser ou savoir si l'utilisation de {\em PKCS5v2} et du {\em HMAC}
-en espace utilisateur est indispensable. De plus les noms de fonctions qui
-correspondent à l'algorithme SHA1 diffèrent entre le noyau et l'espace
-utilisateur, il faudrait donc dupliquer le code ou factoriser en modifiant
-légèrement les sources de SHA1 dans le noyau (ajouter des noms possibles pour
-les différentes fonctions).
-
-\paragraph{}
-Le fichier {\em geom\_eli.c} révèle que ces fonctions sont utilisées pour réaliser
-des opérations sur la phrase de passe, qui sont donc réalisées uniquement ou
-en partie en espace utilisateur.
-
-\paragraph{}
-Pour simplifier l'implémentation, on choisi d'implémenter toutes les opérations
-dans le noyau pour les raisons évoquées ci-dessus, et pour permettre un 
-déchiffrement plus simple de la clé maître comme évoqué en \ref{sub:dechif_cle}.
-\paragraph{}
-On implémente donc les différentes fonctions pour déchiffrer la clé maître à
-partir de la phrase de passe. Ce qui nous permet donc d'arriver à la création
-du disque déchiffré, après avoir traduit correctement les métadonnées de
-{\em GELI} en métadonnées {\em LUKS}, on obtient donc un fonctionnement
-comme décrit par le schéma \ref{fig:fonctionnement}
-
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\linewidth]{choix_developpement/utilisation_metadonnee_luks_2.png}
-\caption{\label{fig:fonctionnement}Fonctionnement de GEOM LUKS}
-\end{figure}
 
 \subsubsection{Champ drapeaux: \texttt{md\_flags}}
 \paragraph{}
@@ -501,13 +401,13 @@ semblable à celui de \textit{GELI}, il est nécessaire d'écrire une fonction
 similaire ayant pour vocation d'aller chercher ces métadonnées au début du
 disque plutôt qu'à la fin.
 
-\section{Passage de l'espace utilisateur au noyau}
+\section{Noyau et espace utilisateur}
 Nous avions donc besoin d'envoyer au noyau la phrase de passe, pour cela il a
 fallu comprendre comment l'utilitaire {\em geom\_eli} passait des commandes et
 des valeurs au module noyau {\em geli}. Le code de {\em GELI} a donc encore une
 fois servi d'exemple.
 
-\subsection{GEOM}
+\subsection{GEOM et passage de l'espace utilisateur au noyau}
 \paragraph{}
 L'API {\em GEOM} s'utilise donc dans le noyau comme nous l'avons vu mais
 également sous la forme d'une bibliothèque que l'on utilise en espace
@@ -529,6 +429,107 @@ entrées utilisateurs, puis de l'envoyer au noyau via la fonction
 {\em gctl\_issue}. Du côté noyau, une fonction permet selon le type de commande
 d'appeler la fonction adéquate avec en argument la structure gctl\_req reçue,
 dont les variables sont utilisées pour accomplir la tâche demandée.
+
+\subsection{Compatibilité de l'implémentation}
+\paragraph{}
+Pour implémenter le support de {\em LUKS} sur {\em FreeBSD}, et donc de nouvelles
+fonctions, ainsi que la modification de fonctions existantes de {\em GELI}, il
+faut savoir pour chaque fonction si elle est utilisée dans le noyau ou en espace
+utilisateur ou encore si elle est utilisée dans les deux cas. En effet, on peut
+par exemple citer l'utilisation de la fonction {\em malloc} qui diffère entre
+le noyau et l'espace utilisateur, on peut également noter que l'utilisation des
+fonctions de chiffrement se fait à travers l'API {\em opencrypto} dans le noyau
+et à travers la bibliothèque {\em OpenSSL} en espace utilisateur. 
+
+\paragraph{}
+Dans l'outil en espace utilisateur permettant d'intéragir avec le module 
+{\em geom\_eli} (dont le fichier source est /sbin/geom/class/eli/geom\_eli.c),
+on peut noter les deux inclusions :
+\begin{lstlisting}
+#include <geom/eli/g_eli.h>
+#include <geom/eli/pkcs5v2.h>
+\end{lstlisting}
+
+\paragraph{}
+Donc les fonctions utilisées directement par l'outil en espace utilisateur sont
+celles dont le prototype ou la définition se trouve dans {\em g\_eli.h} et
+{\em pkcs5v2.h}. On y trouve les structures correspondant aux métadonnées brutes
+comme traitées ({\em g\_eli\_metadata,g\_eli\_softc}) mais aussi les fonctions
+pour décoder et encoder les métadonnées et la fonction qui permet de passer de
+{\em g\_eli\_metadata} à {\em g\_eli\_softc}. Enfin on y trouve les fonctions 
+permettant de chiffrer et déchiffrer la clé maître, avec donc des fonctions
+permettant d'effectuer des opérations de chiffrement et déchiffrement.
+
+
+\paragraph{}
+Si l'on s'intéresse aux objets qui sont assemblés pour produire la bibliothèque
+geom\_luks.o qui est ensuite installée sur le système, on peut noter la présence
+des 4 fichiers suivants :
+\begin{itemize}
+	\item g\_eli\_crypto.c
+	\item g\_eli\_hmac.c
+	\item g\_eli\_key.c
+	\item pkcs5v2.c
+\end{itemize}
+
+\paragraph{}
+Le fichier {\em g\_eli\_crypto.c} contient les fonctions permettant de réaliser
+du chiffrement et déchiffrement qui sont donc implémentées deux fois (une fois
+pour le noyau, une autre pour l'espace utilisateur). Le fichier
+{\em g\_eli\_hmac.c} contient quand à lui une implémentation des fonctions
+permettant de calculer des HMAC avec l'algorithme SHA512. Une seule implémentation
+est présente, elle est compatible entre le noyau et l'espace utilisateur, du fait
+que les fonctions et types associés à SHA512 sont les mêmes entre le noyau et
+l'espace utilisateur.
+Cependant l'API {\em opencrypto} implémente déjà l'algorithme de HMAC avec SHA512.
+La réimplémentation de l'algorithme permettant le calcul d'un HMAC peut très
+probablement s'expliquer du fait qu'elle permet d'avoir un code plus restreint,
+et donc plus facilement maintenable.
+
+Le fichier {\em g\_eli\_key.c} contient quant à lui les fonctions permettant de
+chiffrer, déchiffrer et vérifier la clé maître, en utilisant les fonctions de
+{\em g\_eli\_crypto.c}.
+
+Enfin le fichier {\em pkcs5v2.c} contient les fonctions permettant le calcul
+d'une clé dérivée à partir d'une phrase de passe à travers le standard
+{\em PKCS5v2}, en utilisant les fonctions de {\em g\_eli\_hmac.c}.
+
+\paragraph{}
+Dans l'implémentation du module {\em geom\_luks} on doit pouvoir être capable
+d'utiliser l'algorithme {\em PKCS5v2} avec SHA512 comme dans {\em GELI} mais
+aussi avec {\em SHA1,SHA256,RIPEMD160}. Cela peut être très simple en utilisant
+l'API {\em opencrypto} qui prévoit déjà leur utilisation, cependant conserver
+le modèle de {\em GELI} imposerait l'implémentation de l'algorithme HMAC utilisant
+les autres algorithmes de hashage, et dupliquerait donc du code. Il faudrait
+donc factoriser ou savoir si l'utilisation de {\em PKCS5v2} et du {\em HMAC}
+en espace utilisateur est indispensable. De plus les noms de fonctions qui
+correspondent à l'algorithme SHA1 diffèrent entre le noyau et l'espace
+utilisateur, il faudrait donc dupliquer le code ou factoriser en modifiant
+légèrement les sources de SHA1 dans le noyau (ajouter des noms possibles pour
+les différentes fonctions).
+
+\paragraph{}
+Le fichier {\em geom\_eli.c} révèle que ces fonctions sont utilisées pour réaliser
+des opérations sur la phrase de passe, qui sont donc réalisées uniquement ou
+en partie en espace utilisateur.
+
+\paragraph{}
+Pour simplifier l'implémentation, on choisi d'implémenter toutes les opérations
+dans le noyau pour les raisons évoquées ci-dessus, et pour permettre un 
+déchiffrement plus simple de la clé maître comme évoqué en \ref{sub:dechif_cle}.
+\paragraph{}
+On implémente donc les différentes fonctions pour déchiffrer la clé maître à
+partir de la phrase de passe. Ce qui nous permet donc d'arriver à la création
+du disque déchiffré, après avoir traduit correctement les métadonnées de
+{\em GELI} en métadonnées {\em LUKS}, on obtient donc un fonctionnement
+comme décrit par le schéma \ref{fig:fonctionnement}
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{choix_developpement/utilisation_metadonnee_luks_2.png}
+\caption{\label{fig:fonctionnement}Fonctionnement de GEOM LUKS}
+\end{figure}
 
 \section{Confidentialité}
 \paragraph{}
