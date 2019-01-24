@@ -13,15 +13,54 @@ en commun.
 
 \subsection{Installation des systèmes}
 \subsubsection{Linux}
+\paragraph{}
 Le système Linux utilisé peut être n'importe quelle distribution, tant qu'il est
 possible d'y gérer des disques chiffrés avec le standard \textit{LUKS 1}. Pour
 cela, il est nécessaire que \texttt{cryptsetup} soit installé. La machine ne
 servira ensuite plus qu'à créer les volumes chiffrés avec différents algorithmes
 afin de tester leur déchiffrement depuis FreeBSD.
 \subsubsection{FreeBSD}
+\paragraph{}
 Nous nous sommes basé sur la dernière version stable de FreeBSD à ce jour, à
 savoir la version \textit{11.2-RELEASE}. Il est directement possible d'y
 compiler un nouveau noyau ainsi que ses utilitaires à partir du code source.
+\paragraph{}
+Pour compiler le noyau depuis les sources, il suffit de se placer à la racine
+des dossiers du code source et de lancer la commande suivante:
+\\
+\begin{lstlisting}[language=bash]
+  # FreeBSD
+
+  make -j4 kernel # l'argument -j4 permet d'utiliser 4 threads 
+  shutdown -r now # redémarre le système
+\end{lstlisting}
+\paragraph{}
+Pour simplement mettre à jour le module \texttt{geom\_luks}, il suffit cependant
+de compiler et installer celui-ci, sans devoir recompiler tout le noyau à chaque
+fois.
+\\
+\begin{lstlisting}[language=bash]
+  # FreeBSD
+
+  # décharge le module sans devoir redémarrer le système
+  kldunload geom_luks
+
+  cd $RACINE/sys/modules/geom/geom_luks
+  make
+  make install
+\end{lstlisting}
+\paragraph{}
+À chaque modification des sources, que ce soit celles du module noyau ou de
+l'outil associé, ce dernier doit être compilé et installé.
+\\
+\begin{lstlisting}[language=bash]
+  # FreeBSD
+
+  cd $RACINE/sbin/geom/class/luks
+  make
+  make install
+\end{lstlisting}
+
 
 \subsection{Création des partions chiffrées}
 \paragraph{}
@@ -58,7 +97,10 @@ implémentation de \textit{LUKS} sur FreeBSD est bien capable de le lire.
   # Linux
   
   cryptsetup luksOpen /dev/sdb1 luks_device
-  mkfs.ext2 /dev/sdb1 # necessaire qu'au moment de la creation du volume
+
+  # nécessaire qu'au moment de la création du volume
+  mkfs.ext2 /dev/sdb1
+  
   mount /dev/mapper/luks_device /mnt
   echo "geom_luks: aes-xts-plain64 OK" > /mnt/file.txt
   umount /mnt
@@ -84,7 +126,7 @@ est réalisable sous Linux cette manière:
   mkfs.ext2 /dev/mapper/luks_device
 
   # effectuer les actions voulues sur /dev/loop0
-  # (dechiffrement, montage, lecture, ecriture, ...)
+  # (déchiffrement, montage, lecture, écriture, ...)
 
   cryptsetup luksClose luks_device
   losetup -d /dev/loop0
@@ -112,7 +154,7 @@ courant, il faut d'abord l'attacher en tant que disque avec l'outil
   # attacher le fichier
   mdconfig -a file -u 0
 
-  # detacher le fichier
+  # détacher le fichier
   mdconfig -d -u 0
 \end{lstlisting}
 \paragraph{}
