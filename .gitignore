@@ -1,13 +1,16 @@
 # latexmk
-rapport.aux
-rapport.bbl
-rapport.blg
-rapport.fdb_latexmk
-rapport.fls
-rapport.log
-rapport.pdf
-rapport.out
-rapport.toc
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.pdf
+*.snm
+*.toc
+*.vrb
 
 # emacs auto
 *.el
