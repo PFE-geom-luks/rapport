@@ -12,6 +12,7 @@
 *.snm
 *.toc
 *.vrb
+_region_.tex
 
 # emacs auto
 *.el
