@@ -58,4 +58,60 @@
 
 \begin{frame}
 	\frametitle{\insertsubsectionhead}
-\end{frame}	
+	\begin{figure}
+		\includegraphics[width=.7\textwidth]{developpement/dechiffrement_cle}
+		\caption{Déchiffrement de la clé sous LUKS}
+	\end{figure}
+\end{frame}
+
+\subsection{Sélection des algorithmes}
+
+\subsection{Drapeaux}
+
+\subsection{Création du disque déchiffré}
+
+\begin{frame}
+	\frametitle{\insertsubsectionhead}
+	\begin{block}{Quelques changements par rapport à \textit{GELI}}
+		\begin{itemize}
+			\item Taille du disque
+				\pause
+			\item Décalage
+				\pause
+			\item Lecture de métadonnées au début du disque
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\subsection{Passage de l'espace utilisateur au noyau}
+
+\begin{frame}
+	\frametitle{\insertsubsectionhead}
+	\begin{block}{API GEOM}
+		\begin{itemize}
+			\item Structure g\_ctl\_req
+			\item Instruction g\_ctl\_issue
+			\item structure g\_command
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\insertsubsectionhead}
+	\begin{block}{Code noyau ou espace utilisateur ?}
+		\begin{itemize}
+			\item API noyau Opencrypto - Openssl
+			\item Malloc
+			\item HMAC et PKCS5v2
+			\item Dérivation de la phrase de passe
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\insertsubsectionhead - Implémentation}
+	\begin{figure}
+		\includegraphics[width=\textwidth]{developpement/utilisation_metadonnee_luks_2}
+		\caption{Fonctionnement de GEOM\_LUKS}
+	\end{figure}
+\end{frame}
