@@ -4,7 +4,6 @@
 
 \begin{frame}
   \frametitle{\insertsubsectionhead}
-  \pause
   \begin{block}{Chiffrement à différents niveaux}
     \begin{itemize}
     \item Chiffrement matériel
@@ -19,10 +18,8 @@
 
 \begin{frame}
   \frametitle{\insertsubsectionhead}
-  \pause
-  \begin{block}{Chiffrement}
+  \begin{block}{Chiffrement logiciel}
     \begin{itemize}
-      \pause
     \item Transparent pour l'utilisateur
     \item Géré par des modules noyau
     \item Réalisé au moment de la lecture ou l'écriture
@@ -33,10 +30,8 @@
 
 \begin{frame}
   \frametitle{\insertsubsectionhead}
-  \pause
   \begin{block}{Sur \textbf{Linux}}
     \begin{itemize}
-      \pause
     \item Outil \textit{cryptsetup}
     \item Module \textit{dm-crypt}
     \item Standard \textit{LUKS}: \textit{Linux Ufified Key Setup}
@@ -46,7 +41,6 @@
   \pause
   \begin{block}{Sur \textbf{FreeBSD}}
     \begin{itemize}
-      \pause
     \item Outil et module \textit{GELI}
     \item Paramètres possibles codés en dur
     \item Empilement avec d'autres transformations \textit{GEOM}
@@ -74,12 +68,11 @@
 
 \begin{frame}
   \frametitle{\insertsubsectionhead}
-  \pause
   \begin{center}
     Format = organisation des données et métadonnées sur le disque
   \end{center}
   \pause
-  \begin{block}{Format \textit{LUKS} - Linux}
+  \begin{block}{Format \textit{LUKS}}
     \begin{itemize}
     \item \textit{LUKS header} \textrightarrow{} métadonnées
     \item \textit{Keyslots} \textrightarrow{} 8 phrases secrètes
@@ -87,7 +80,7 @@
     \end{itemize}
   \end{block}
   \pause
-  \begin{block}{Format \textit{GELI} - FreeBSD}
+  \begin{block}{Format \textit{GELI}}
     \begin{itemize}
     \item Données chiffrées
     \item \textit{GELI header} \textrightarrow{} métadonnées
@@ -108,7 +101,30 @@
   \end{figure}
 \end{frame}
 
-\subsection{Algorithmes communs aux deux systèmes}
+\subsection{Algorithmes}
+
+\begin{frame}
+  \frametitle{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=.9\textwidth]{etat_art/disk_sectors}
+    \caption{Chiffrement par secteur}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\insertsubsectionhead}
+  \begin{block}{Chiffrement}
+    \begin{itemize}
+    \item Même algorithme pour tout le disque
+    \end{itemize}
+  \end{block}
+  \begin{block}{Vecteur d'initialisation}
+    \begin{itemize}
+    \item Unique à chaque secteur
+    \item Secteurs de 512 ou 4096 octets
+    \end{itemize}
+  \end{block}
+\end{frame}
 
 \begin{frame}
   \frametitle{\insertsubsectionhead}
