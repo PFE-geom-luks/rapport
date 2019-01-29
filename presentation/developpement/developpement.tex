@@ -9,15 +9,10 @@
 		\begin{itemize}
 			\pause
 		\item le \textit{MAGIC}
-			\pause
 		\item Version
-			\pause
 		\item Algorithme de chiffrement et de hashage
-			\pause
 		\item Sel
-			\pause
 		\item nombre d'itérations pour PKCS5v2
-			\pause
 		\item clé maître chiffrée
 		\end{itemize}
 	\end{block}
@@ -64,9 +59,19 @@
 	\end{figure}
 \end{frame}
 
-\subsection{Sélection des algorithmes}
+\subsection{Utilisation de drapeaux \textit{GELI}}
 
-\subsection{Drapeaux}
+\begin{frame}
+  \frametitle{\insertsubsectionhead}
+  \begin{block}{activer/désactiver options de chiffrement de disques}
+    \begin{itemize}
+    \item \texttt{G\_ELI\_FLAG\_AUTH} \\
+      \textrightarrow{} activer l'auhentification
+    \item \texttt{G\_ELI\_FLAG\_SINGLE\_KEY} \\
+      \textrightarrow{} utiliser la même clé maître pour tous les secteurs
+    \end{itemize}
+  \end{block}
+\end{frame}
 
 \subsection{Création du disque déchiffré}
 
@@ -89,9 +94,9 @@
 	\frametitle{\insertsubsectionhead}
 	\begin{block}{API GEOM}
 		\begin{itemize}
-			\item Structure g\_ctl\_req
-			\item Instruction g\_ctl\_issue
-			\item structure g\_command
+			\item Structure \texttt{g\_ctl\_req}
+			\item Instruction \texttt{g\_ctl\_issue}
+			\item structure \texttt{g\_command}
 		\end{itemize}
 	\end{block}
 \end{frame}
