@@ -3,7 +3,7 @@
 \subsection{Les métadonnées}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead}
+	\frametitle{\insertsubsectionhead{}}
 	\begin{block}{Des métadonnées en communs}
 		\begin{itemize}
 		\item Le \textit{MAGIC}
@@ -17,7 +17,7 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead - \textbf{FreeBSD}}
+	\frametitle{\insertsubsectionhead{} - \textbf{FreeBSD}}
 	\begin{figure}
 		\includegraphics[width=.8\textwidth]{developpement/utilisation_metadonnee}
 		\caption{Utilisation des métadonnées dans FreeBSD}
@@ -25,14 +25,14 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead - Utilisation dans le code}
+	\frametitle{\insertsubsectionhead{} - Utilisation dans le code}
 	\begin{figure}
 		\includegraphics[width=.8\textwidth]{developpement/fonctions_g_luks_metadata}
 		\caption{Utilisation de la structure g\_luks\_metadata}
 	\end{figure}
 \end{frame}
 \begin{frame}
-	\frametitle{\insertsubsectionhead - Utilisation dans le code}
+	\frametitle{\insertsubsectionhead{} - Utilisation dans le code}
 	\begin{figure}
 		\includegraphics[width=.8\textwidth]{developpement/fonctions_g_luks_softc}
 		\caption{Utilisation de la structure g\_luks\_softc}
@@ -40,7 +40,7 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead - Transformation des métadonnées}
+	\frametitle{\insertsubsectionhead{} - Transformation des métadonnées}
 	\begin{figure}
 		\includegraphics[width=\textwidth]{developpement/utilisation_metadonnee_luks}
 		\caption{Introduction d'un structure intermédiaire}
@@ -50,7 +50,7 @@
 \subsection{Déchiffrement de la clé}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead}
+	\frametitle{\insertsubsectionhead{}}
 	\begin{figure}
 		\includegraphics[width=.7\textwidth]{developpement/dechiffrement_cle}
 		\caption{Déchiffrement de la clé sous LUKS}
@@ -60,7 +60,7 @@
 \subsection{Utilisation de drapeaux \textit{GELI}}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \begin{block}{Activer/désactiver options de chiffrement de disques}
     \begin{itemize}
     \item \texttt{G\_ELI\_FLAG\_AUTH} \\
@@ -74,7 +74,7 @@
 \subsection{Création du disque déchiffré}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead}
+	\frametitle{\insertsubsectionhead{}}
 	\begin{block}{Quelques changements par rapport à \textit{GELI}}
 		\begin{itemize}
 			\item Taille du disque
@@ -89,7 +89,7 @@
 \subsection{Passage de l'espace utilisateur au noyau}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead}
+	\frametitle{\insertsubsectionhead{}}
 	\begin{block}{API GEOM}
 		\begin{itemize}
 			\item Structure \texttt{g\_ctl\_req}
@@ -100,7 +100,7 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead}
+	\frametitle{\insertsubsectionhead{}}
 	\begin{block}{Code noyau ou espace utilisateur ?}
 		\begin{itemize}
 			\item API noyau Opencrypto - Openssl
@@ -112,7 +112,7 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{\insertsubsectionhead - Implémentation}
+	\frametitle{\insertsubsectionhead{} - Implémentation}
 	\begin{figure}
 		\includegraphics[width=\textwidth]{developpement/utilisation_metadonnee_luks_2}
 		\caption{Fonctionnement de GEOM\_LUKS}

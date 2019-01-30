@@ -3,7 +3,7 @@
 \subsection{Différents types de chiffrement}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \begin{block}{Chiffrement à différents niveaux}
     \begin{itemize}
     \item Chiffrement matériel
@@ -17,28 +17,27 @@
 \subsection{Chiffrement et organisation dans le système}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \begin{block}{Chiffrement logiciel}
     \begin{itemize}
-    \item Transparent pour l'utilisateur
     \item Géré par des modules noyau
-    \item Réalisé au moment de la lecture ou l'écriture
     \item Possible avec différents algorithmes
+    \item Réalisé au moment de la lecture ou l'écriture
+    \item Transparent pour l'utilisateur
     \end{itemize}
   \end{block}
 \end{frame}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \begin{block}{Sur \textbf{Linux}}
     \begin{itemize}
     \item Outil \textit{cryptsetup}
     \item Module \textit{dm-crypt}
-    \item Standard \textit{LUKS}: \textit{Linux Ufified Key Setup}
+    \item Standard \textit{LUKS}: \textit{Linux Unified Key Setup}
     \item Empilement avec d'autres transformations \textit{device-mapper}
     \end{itemize}
   \end{block}
-  \pause
   \begin{block}{Sur \textbf{FreeBSD}}
     \begin{itemize}
     \item Outil et module \textit{GELI}
@@ -49,7 +48,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead - \textbf{Linux}}
+  \frametitle{\insertsubsectionhead{} - \textbf{Linux}}
   \begin{figure}
     \includegraphics[width=\textwidth]{etat_art/organisation_linux}
     \caption{Organisation du code dans Linux}
@@ -57,7 +56,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead - \textbf{FreeBSD}}
+  \frametitle{\insertsubsectionhead{} - \textbf{FreeBSD}}
   \begin{figure}
     \includegraphics[width=\textwidth]{etat_art/organisation_freebsd}
     \caption{Organisation du code dans FreeBSD}
@@ -67,11 +66,10 @@
 \subsection{Format sur le disque}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \begin{center}
     Format = organisation des données et métadonnées sur le disque
   \end{center}
-  \pause
   \begin{block}{Format \textit{LUKS}}
     \begin{itemize}
     \item \textit{LUKS header} \textrightarrow{} métadonnées
@@ -79,7 +77,6 @@
     \item Données chiffrées
     \end{itemize}
   \end{block}
-  \pause
   \begin{block}{Format \textit{GELI}}
     \begin{itemize}
     \item Données chiffrées
@@ -89,7 +86,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \begin{figure}
     \includegraphics[width=\textwidth]{etat_art/format_disque_luks}
     \caption{Format sur disque \textit{LUKS}}
@@ -104,7 +101,7 @@
 \subsection{Algorithmes}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \begin{figure}
     \includegraphics[width=.9\textwidth]{etat_art/disk_sectors}
     \caption{Chiffrement par secteur}
@@ -112,7 +109,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \begin{block}{Chiffrement}
     \begin{itemize}
     \item Même algorithme pour tout le disque
@@ -127,7 +124,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{\insertsubsectionhead}
+  \frametitle{\insertsubsectionhead{}}
   \vfill
   \begin{center}
     \renewcommand{\arraystretch}{2}
